@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>House Rota</title>
+<meta name="theme-color" content="#0f7c86">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="House Rota">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root {
+  --bg: #eef4f5; --surface: #ffffff; --ink: #15292e; --muted: #5b7176; --line: #d3e1e4;
+  --accent: #0f7c86; --glove: #f2c230; --glove-ink: #3d2f00;
+  --done: #2f8a4c; --done-soft: #dcf1e2; --warn: #b5541c; --warn-soft: #fbe6d8;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --bg: #0e1a1d; --surface: #16262a; --ink: #e4f0f2; --muted: #93abb0; --line: #27403f;
+  --accent: #4cc3cc; --done: #5fcf83; --done-soft: #183526; --warn: #f0935c; --warn-soft: #3a2316; color-scheme: dark } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.45; -webkit-tap-highlight-color: transparent; }
+.wrap { max-width: 520px; margin: 0 auto;
+  padding: calc(20px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(40px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  display: grid; gap: 22px; }
+h1, h2 { font-family: var(--display); margin: 0; text-wrap: balance; }
+.eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; }
+header { display: grid; gap: 6px; }
+header h1 { font-size: 30px; font-weight: 800; line-height: 1.05; }
+.pair { color: var(--accent); }
+.deadline { justify-self: start; background: var(--glove); color: var(--glove-ink); font-weight: 700; font-size: 14px; padding: 6px 12px; border-radius: 999px; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.deadline.late { background: var(--warn-soft); color: var(--warn); }
+.deadline.ok { background: var(--done-soft); color: var(--done); }
+.progress { display: grid; gap: 6px; }
+.bar { height: 10px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.bar > span { display: block; height: 100%; width: 0; background: var(--done); transition: width .3s ease; }
+.progress small { color: var(--muted); font-variant-numeric: tabular-nums; }
+.people { display: grid; gap: 14px; }
+.person { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; }
+.person h2 { font-size: 20px; font-weight: 600; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.person h2 small { font-family: var(--body); font-size: 13px; color: var(--muted); font-weight: 400; }
+.rooms { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.room { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; font: inherit; color: inherit; background: var(--bg); border: 1px solid transparent; border-radius: 10px; padding: 12px; cursor: pointer; min-height: 52px; }
+.room:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.room[disabled] { cursor: default; opacity: .75; }
+.tick { flex: none; width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--muted); display: grid; place-items: center; }
+.tick svg { width: 16px; height: 16px; opacity: 0; }
+.room.is-done { background: var(--done-soft); }
+.room.is-done .tick { background: var(--done); border-color: var(--done); }
+.room.is-done .tick svg { opacity: 1; }
+.room.is-done .rname { text-decoration: line-through; text-decoration-color: var(--done); }
+.rname { font-weight: 700; }
+.rhint { display: block; font-size: 13px; color: var(--muted); }
+.status { font-size: 13px; color: var(--muted); min-height: 1.2em; margin: -8px 0 0; }
+section > h2.sec { font-size: 18px; font-weight: 600; margin-bottom: 10px; }
+.weeks { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.weeks li { display: grid; grid-template-columns: 5.5em 1fr; gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.weeks .date { color: var(--muted); }
+.weeks .who { min-width: 0; }
+.chips { grid-column: 2; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--done-soft); color: var(--done); font-weight: 700; }
+.chip.miss { background: var(--warn-soft); color: var(--warn); }
+.weeks li.empty { display: block; color: var(--muted); font-size: 14px; }
+details { color: var(--muted); font-size: 14px; }
+details summary { cursor: pointer; font-weight: 700; color: var(--ink); }
+details p { margin: 8px 0 0; }
+@media (prefers-reduced-motion: reduce) { .bar > span { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow" id="weekLabel">This week</span>
+    <h1>On cleaning: <span class="pair" id="pairName">…</span></h1>
+    <span class="deadline" id="deadline">Due Sunday night</span>
+  </header>
+
+  <section class="progress" aria-label="Progress this week">
+    <div class="bar"><span id="barFill"></span></div>
+    <small id="progressText">0 of 5 rooms done</small>
+  </section>
+
+  <section class="people" id="people"></section>
+  <p class="status" id="status" role="status"></p>
+
+  <section>
+    <h2 class="sec">Previous weeks</h2>
+    <ul class="weeks" id="history"></ul>
+  </section>
+
+  <section>
+    <h2 class="sec">Coming up</h2>
+    <ul class="weeks" id="upcoming"></ul>
+  </section>
+
+  <details>
+    <summary>How the rota works</summary>
+    <p>It flips every Monday. Fraser &amp; Ewan take one week, Tom &amp; Jayden the next. Each pair splits the five rooms: one person does the kitchen and hallway, the other does the living room, toilet and shower room. Next time your pair is up, you swap halves.</p>
+    <p>Everything is due by Sunday 23:59. Tap a room when it's done and everyone sees it.</p>
+    <p>Keep it on your phone: iPhone, Share → Add to Home Screen. Android, ⋮ → Add to Home screen.</p>
+  </details>
+</div>
+
+<script>
+// ---- Storage config: Supabase project (filled in once created) ----
+const SUPABASE_URL = "";      // e.g. https://abcd1234.supabase.co
+const SUPABASE_KEY = "";      // the project's public anon key
+
+const PAIRS = [["Fraser", "Ewan"], ["Tom", "Jayden"]];
+const ANCHOR = new Date(2026, 10, 9); // Mon 9 Nov 2026 = Fraser & Ewan, Fraser on the kitchen half
+const HALVES = [
+  [{ id: "kitchen", name: "Kitchen", hint: "Surfaces, hob, sink, floor, bins out" },
+   { id: "hallway", name: "Hallway", hint: "Hoover, shoes tidied, skirting" }],
+  [{ id: "living", name: "Living room", hint: "Tidy, dust, hoover" },
+   { id: "toilet", name: "Toilet", hint: "Bowl, seat, sink, floor" },
+   { id: "shower", name: "Shower room", hint: "Shower, glass, sink, mirror, floor" }]
+];
+const ALL_ROOMS = HALVES.flat();
+const DAY = 86400000;
+const HISTORY_WEEKS = 4;
+
+const mondayOf = d => { const m = new Date(d.getFullYear(), d.getMonth(), d.getDate()); m.setDate(m.getDate() - ((m.getDay() + 6) % 7)); return m; };
+const addWeeks = (m, n) => { const d = new Date(m); d.setDate(d.getDate() + 7 * n); return d; };
+const weekIndex = m => Math.round((m - ANCHOR) / (7 * DAY));
+const keyOf = m => `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, "0")}-${String(m.getDate()).padStart(2, "0")}`;
+const mod = (n, k) => ((n % k) + k) % k;
+const fmt = d => d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+function rotaFor(m) {
+  const w = weekIndex(m), pair = PAIRS[mod(w, 2)], swap = mod(Math.floor(w / 2), 2) === 1;
+  return { pair, people: swap ? [[pair[1], HALVES[0]], [pair[0], HALVES[1]]] : [[pair[0], HALVES[0]], [pair[1], HALVES[1]]] };
+}
+
+const thisMonday = mondayOf(new Date());
+const thisKey = keyOf(thisMonday);
+const rota = rotaFor(thisMonday);
+let ticks = {};            // { "2026-11-09": { kitchen: true, ... }, ... }
+let connected = false;
+const $ = id => document.getElementById(id);
+const done = () => ticks[thisKey] || {};
+const TICK = '<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
+
+// ---- Supabase REST (table: ticks(week text primary key, data jsonb)) ----
+const api = (path, opts = {}) => fetch(`${SUPABASE_URL}/rest/v1/${path}`, { ...opts,
+  headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", ...(opts.headers || {}) } });
+async function load() {
+  const from = keyOf(addWeeks(thisMonday, -HISTORY_WEEKS));
+  const r = await api(`ticks?select=week,data&week=gte.${from}`);
+  if (!r.ok) throw new Error(r.status);
+  const rows = await r.json();
+  ticks = Object.fromEntries(rows.map(x => [x.week, x.data || {}]));
+}
+async function save(week, data) {
+  const r = await api("ticks?on_conflict=week", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify({ week, data }) });
+  if (!r.ok) throw new Error(r.status);
+}
+
+// ---- Render ----
+function renderHeader() {
+  $("weekLabel").textContent = `Week of ${fmt(thisMonday)} – ${fmt(new Date(addWeeks(thisMonday, 1) - DAY))}`;
+  $("pairName").textContent = rota.pair.join(" & ");
+}
+function renderDeadline() {
+  const el = $("deadline"), d = done();
+  el.className = "deadline";
+  if (ALL_ROOMS.every(r => d[r.id])) { el.textContent = "All done this week"; el.classList.add("ok"); return; }
+  const ms = addWeeks(thisMonday, 1) - 60000 - new Date();
+  const days = Math.floor(ms / DAY), hrs = Math.floor((ms % DAY) / 3600000);
+  el.textContent = days >= 1 ? `Due Sun 23:59 · ${days}d ${hrs}h left` : `Due tonight 23:59 · ${hrs}h left`;
+  if (days < 1) el.classList.add("late");
+}
+function renderPeople() {
+  const box = $("people"), d = done();
+  box.textContent = "";
+  for (const [name, rooms] of rota.people) {
+    const card = document.createElement("article");
+    card.className = "person";
+    card.innerHTML = `<h2><span></span><small>${rooms.filter(r => d[r.id]).length}/${rooms.length} done</small></h2><ul class="rooms"></ul>`;
+    card.querySelector("h2 span").textContent = name;
+    for (const r of rooms) {
+      const li = document.createElement("li"), b = document.createElement("button");
+      b.type = "button"; b.className = "room" + (d[r.id] ? " is-done" : "");
+      b.setAttribute("aria-pressed", d[r.id] ? "true" : "false");
+      b.disabled = !connected;
+      b.innerHTML = `<span class="tick">${TICK}</span><span><span class="rname"></span><span class="rhint"></span></span>`;
+      b.querySelector(".rname").textContent = r.name;
+      b.querySelector(".rhint").textContent = r.hint;
+      b.addEventListener("click", () => toggle(r.id));
+      li.appendChild(b); card.querySelector("ul").appendChild(li);
+    }
+    box.appendChild(card);
+  }
+  const n = ALL_ROOMS.filter(r => d[r.id]).length;
+  $("barFill").style.width = (n / ALL_ROOMS.length * 100) + "%";
+  $("progressText").textContent = `${n} of ${ALL_ROOMS.length} rooms done`;
+  renderDeadline();
+}
+function weekRow(m, withResults) {
+  const r = rotaFor(m), li = document.createElement("li");
+  li.innerHTML = '<span class="date"></span><span class="who"></span>';
+  li.children[0].textContent = fmt(m);
+  if (!withResults) {
+    li.children[1].textContent = r.people.map(([p, rooms]) => `${p}: ${rooms.map(x => x.name).join(", ")}`).join(" · ");
+    return li;
+  }
+  const t = ticks[keyOf(m)] || {}, n = ALL_ROOMS.filter(x => t[x.id]).length;
+  li.children[1].textContent = `${r.pair.join(" & ")} · ${n}/5 done`;
+  const chips = document.createElement("div"); chips.className = "chips";
+  for (const [p, rooms] of r.people) for (const x of rooms) {
+    const c = document.createElement("span");
+    c.className = "chip" + (t[x.id] ? "" : " miss");
+    c.textContent = `${t[x.id] ? "✓" : "✗"} ${x.name} (${p})`;
+    chips.appendChild(c);
+  }
+  li.appendChild(chips);
+  return li;
+}
+function renderHistory() {
+  const ul = $("history"); ul.textContent = "";
+  for (let i = 1; i <= HISTORY_WEEKS; i++) {
+    const m = addWeeks(thisMonday, -i);
+    if (m < ANCHOR) break;
+    ul.appendChild(weekRow(m, true));
+  }
+  if (!ul.children.length) ul.innerHTML = '<li class="empty">The rota started on 9 Nov. Last week\'s results will show here from Monday 16 Nov.</li>';
+}
+function renderUpcoming() {
+  const ul = $("upcoming"); ul.textContent = "";
+  for (let i = 1; i <= 4; i++) ul.appendChild(weekRow(addWeeks(thisMonday, i), false));
+}
+const renderAll = () => { renderPeople(); renderHistory(); };
+
+let busy = false;
+async function toggle(id) {
+  if (!connected || busy) return;
+  busy = true;
+  try {
+    await load();                                   // get latest so we don't wipe someone else's tick
+    const next = { ...done(), [id]: !done()[id] };
+    ticks[thisKey] = next; renderAll();
+    await save(thisKey, next);
+    $("status").textContent = "Saved. Everyone can see it.";
+  } catch (e) {
+    $("status").textContent = "Couldn't save that. Check your signal and tap again.";
+  } finally { busy = false; }
+}
+async function refresh() {
+  try { await load(); connected = true; $("status").textContent = "Tap a room when it's done."; }
+  catch (e) { $("status").textContent = connected ? "Couldn't refresh. Showing the last ticks we had." : "Couldn't load ticks. Check your signal."; }
+  renderAll();
+}
+
+renderHeader(); renderUpcoming(); renderAll();
+if (SUPABASE_URL && SUPABASE_KEY) {
+  refresh();
+  setInterval(() => { if (!busy && document.visibilityState === "visible") refresh(); }, 20000);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refresh(); });
+} else {
+  $("status").textContent = "Ticking isn't connected yet. The rota is still correct.";
+}
+setInterval(renderDeadline, 60000);
+</script>
+</body>
+</html>
