@@ -136,6 +136,20 @@ details p { margin: 8px 0 0; }
   <section class="people" id="people"></section>
   <p class="status" id="status" role="status"></p>
 
+  <section class="card">
+    <div class="sechead"><h2 class="sec">Comments</h2><p>Notes for this week, e.g. "bins still need doing" or "great job on the kitchen".</p></div>
+    <ul class="list" id="comments"></ul>
+    <select id="commentRoom" aria-label="About which room">
+      <option value="">General</option>
+      <option value="kitchen">Kitchen</option><option value="hallway">Hallway</option>
+      <option value="living">Living room</option><option value="toilet">Toilet</option><option value="shower">Shower room</option>
+    </select>
+    <div class="row">
+      <input type="text" id="commentInput" maxlength="200" placeholder="Write a comment…">
+      <button class="btn primary" id="commentBtn" type="button">Post</button>
+    </div>
+  </section>
+
   <section class="card" id="extCard">
     <div class="sechead"><h2 class="sec">Need more time?</h2><p id="extIntro">Ask for an extension on your rooms this week.</p></div>
     <div id="extBody"></div>
@@ -298,8 +312,20 @@ function renderPeople() {
       b.setAttribute("aria-pressed", d[r.id] ? "true" : "false");
       b.innerHTML = `<span class="tick">${TICK}</span><span><span class="rname"></span><span class="rhint"></span></span>`;
       b.querySelector(".rname").textContent = r.name;
-      b.querySelector(".rhint").textContent = r.hint;
-      b.addEventListener("click", () => change("week:" + thisKey, x => ({ ...x, ticks: { ...(x.ticks || {}), [r.id]: !(x.ticks || {})[r.id] } })));
+      const tk = d[r.id];
+      b.querySelector(".rhint").textContent = tk && typeof tk === "object"
+        ? `Done${tk.by ? " by " + tk.by : ""} · ${fmtWhen(tk.at)} · tap to undo`
+        : r.hint;
+      b.addEventListener("click", () => change("week:" + thisKey, x => {
+        const t = { ...(x.ticks || {}) }, prev = t[r.id], out = { ...x, ticks: t };
+        if (prev) {
+          delete t[r.id];
+          // Unticking someone else's room leaves a visible note so nobody's tick vanishes silently
+          const by = typeof prev === "object" ? prev.by : null;
+          if (by && by !== me) out.comments = [...(x.comments || []), { id: uid(), by: me || null, at: Date.now(), room: r.id, text: `Unticked ${r.name} (was ticked by ${by})` }];
+        } else t[r.id] = { by: me || null, at: Date.now() };
+        return out;
+      }));
       li.append(b); ul.append(li);
     }
     card.append(ul); box.append(card);
@@ -420,7 +446,34 @@ function renderUpcoming() {
   const ul = $("upcoming"); ul.textContent = "";
   for (let i = 1; i <= 4; i++) ul.append(weekRow(addWeeks(thisMonday, i), false));
 }
-function renderAll() { renderMe(); renderPeople(); renderExtension(); renderAway(); renderSupplies(); renderHistory(); renderUpcoming(); }
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const fmtWhen = ts => new Date(ts).toLocaleString("en-GB", { weekday: "short", hour: "2-digit", minute: "2-digit" });
+const ROOM_NAME = Object.fromEntries(ALL_ROOMS.map(r => [r.id, r.name]));
+function renderComments() {
+  const ul = $("comments"), list = wk(thisKey).comments || [];
+  ul.textContent = "";
+  if (!list.length) ul.append(el("li", "empty", "No comments this week yet."));
+  for (const c of list) {
+    const li = el("li"), what = el("div", "what");
+    what.append(el("b", null, c.text), el("small", null, `${c.by || "Someone"}${c.room ? " · " + ROOM_NAME[c.room] : ""} · ${fmtWhen(c.at)}`));
+    li.append(what);
+    if (me && c.by === me) {
+      const b = el("button", "btn small", "Delete"); b.type = "button";
+      b.addEventListener("click", () => change("week:" + thisKey, x => ({ ...x, comments: (x.comments || []).filter(y => y.id !== c.id) }), "Comment deleted."));
+      li.append(b);
+    }
+    ul.append(li);
+  }
+  $("commentBtn").disabled = !me;
+  $("commentInput").placeholder = me ? "Write a comment…" : "Choose who you are at the top first";
+}
+function postComment() {
+  const text = $("commentInput").value.trim(); if (!text || !me) return;
+  const room = $("commentRoom").value || null;
+  change("week:" + thisKey, x => ({ ...x, comments: [...(x.comments || []), { id: uid(), by: me, at: Date.now(), room, text }] }), "Comment posted. Everyone can see it.");
+  $("commentInput").value = "";
+}
+function renderAll() { renderMe(); renderPeople(); renderComments(); renderExtension(); renderAway(); renderSupplies(); renderHistory(); renderUpcoming(); }
 
 async function refresh() {
   if (busy) return;
@@ -430,6 +483,8 @@ async function refresh() {
 }
 
 $("meSelect").addEventListener("change", e => { me = e.target.value; try { localStorage.setItem("rota-me", me); } catch (err) {} renderAll(); });
+$("commentBtn").addEventListener("click", postComment);
+$("commentInput").addEventListener("keydown", e => { if (e.key === "Enter") postComment(); });
 $("supplyBtn").addEventListener("click", () => addSupply($("supplyInput").value));
 $("supplyInput").addEventListener("keydown", e => { if (e.key === "Enter") addSupply(e.target.value); });
 
