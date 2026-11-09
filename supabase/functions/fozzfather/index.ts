@@ -37,11 +37,12 @@ function london() {
   return { today, hour: +parts.hour, dow, monday: today - dow * DAY };
 }
 
+const payersOf = (e: any): Record<string, number> => typeof e.paidBy === "string" ? { [e.paidBy]: e.amount } : (e.paidBy || {});
 const gbp = (p: number) => "£" + (Math.abs(p) / 100).toFixed(2);
 function nets(m: any) {
   const n: Record<string, number> = Object.fromEntries(PEOPLE.map(p => [p, 0]));
   for (const [p, v] of Object.entries(m.opening || {})) n[p] += v as number;
-  for (const e of m.expenses || []) { n[e.paidBy] += e.amount; for (const [p, v] of Object.entries(e.split)) n[p] -= v as number; }
+  for (const e of m.expenses || []) { for (const [p, v] of Object.entries(payersOf(e))) n[p] += v as number; for (const [p, v] of Object.entries(e.split)) n[p] -= v as number; }
   for (const t of m.settlements || []) { n[t.from] += t.amount; n[t.to] -= t.amount; }
   return n;
 }
@@ -158,24 +159,34 @@ Deno.serve(async req => {
     const msg = { person: "", title: "The Fozzfather", body: "It's the Fozzfather. You'll hear from me about cleaning, bills and the house.", url: APP + "#home", tag: "welcome" };
     return json(await deliver([msg], body.endpoint));
   }
-  // New expense / settle up: notify the people involved, once per item
-  if ((body.mode === "expense" || body.mode === "settle") && typeof body.id === "string") {
+  // New/edited expense, comment, or settle up: notify the people involved, once per item/revision
+  if (["expense", "settle", "excomment"].includes(body.mode) && typeof body.id === "string") {
     const { data: rows } = await db.from("rota").select("key,data").in("key", ["money", "fozz:items"]);
     const get = (k: string) => (rows || []).find((r: any) => r.key === k)?.data || {};
     const money = get("money"), done: string[] = get("fozz:items").ids || [];
-    if (done.includes(body.id)) return json({ skipped: "already sent" });
+    const dkey = `${body.mode}:${body.id}:${body.rev || body.cid || 0}`;
+    if (done.includes(dkey)) return json({ skipped: "already sent" });
     const msgs: Msg[] = [];
-    if (body.mode === "expense") {
-      const e = (money.expenses || []).find((x: any) => x.id === body.id);
-      if (!e) return json({ error: "not found" }, 404);
-      for (const [p, share] of Object.entries(e.split) as [string, number][]) if (p !== e.paidBy)
-        msgs.push({ person: p, title: "The Fozzfather", body: `${e.paidBy} added ${e.desc} · ${gbp(e.amount)}. Your share: ${gbp(share)}.`, url: APP + "#money", tag: "ex-" + e.id });
-    } else {
+    const mk = (person: string, text: string, tag: string) => msgs.push({ person, title: "The Fozzfather", body: text, url: APP + "#money", tag });
+    if (body.mode === "settle") {
       const t = (money.settlements || []).find((x: any) => x.id === body.id);
       if (!t) return json({ error: "not found" }, 404);
-      msgs.push({ person: t.to, title: "The Fozzfather", body: `${t.from} says they've paid you ${gbp(t.amount)}. Check it's arrived.`, url: APP + "#money", tag: "st-" + t.id });
+      mk(t.to, `${t.from} says they've paid you ${gbp(t.amount)}${t.method ? ` (${t.method.toLowerCase()})` : ""}. Check it's arrived.`, "st-" + t.id);
+    } else {
+      const e = (money.expenses || []).find((x: any) => x.id === body.id);
+      if (!e) return json({ error: "not found" }, 404);
+      const pay = payersOf(e), payerNames = Object.keys(pay), involved = new Set([...payerNames, ...Object.keys(e.split)]);
+      if (body.mode === "excomment") {
+        const c = (e.comments || []).find((x: any) => x.id === body.cid);
+        if (!c) return json({ error: "not found" }, 404);
+        for (const p of involved) if (p !== c.by) mk(p, `💬 ${c.by} on ${e.desc}: "${String(c.text).slice(0, 120)}"`, "cm-" + e.id);
+      } else {
+        const who = body.rev ? (e.editedBy || "Someone") : (e.by || payerNames[0]);
+        for (const p of Object.keys(e.split)) if (!(pay[p] && pay[p] >= e.split[p]) && p !== who)
+          mk(p, body.rev ? `${who} edited ${e.desc}. Your share is now ${gbp(e.split[p])}.` : `${who} added ${e.desc} · ${gbp(e.amount)}. Your share: ${gbp(e.split[p])}.`, "ex-" + e.id);
+      }
     }
-    await db.from("rota").upsert({ key: "fozz:items", data: { ids: [...done, body.id].slice(-200) } });
+    await db.from("rota").upsert({ key: "fozz:items", data: { ids: [...done, dkey].slice(-300) } });
     return json(await deliver(msgs));
   }
 

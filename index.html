@@ -266,6 +266,62 @@ details.adder.inner > summary { display: inline-flex; align-items: center; }
 .legend span { display: inline-flex; align-items: center; gap: 5px; }
 .legend span::before { content: ""; }
 
+/* ---- Money (Splitwise-style) ---- */
+.toggle { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); }
+.toggle input { width: 18px; height: 18px; accent-color: var(--accent); }
+.btnrow { display: flex; gap: 8px; flex-wrap: wrap; }
+.btnrow .btn { flex: 1 1 auto; }
+#pairList li { flex-wrap: wrap; row-gap: 6px; }
+#pairList .what { flex: 1 1 100%; }
+#pairList .what b { display: inline; }
+#pairList .actions { margin-left: auto; }
+.breakrows li { flex-wrap: wrap; }
+.breakrows .who-row { flex-wrap: nowrap; white-space: nowrap; }
+.owe { color: var(--red); } .owed { color: var(--done); } .muted { color: var(--muted); }
+.acthead { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.acthead input { flex: 0 1 12em; min-width: 0; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 8px 10px; font: inherit; color: inherit; }
+.monthhead { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 14px 2px 6px; }
+ul.act { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+ul.act li + li { border-top: 1px solid var(--line); }
+.actrow { display: grid; grid-template-columns: 2.4em 2em 1fr auto; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; background: none; border: 0; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.actrow:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+.datebox { display: grid; justify-items: center; line-height: 1.05; color: var(--muted); }
+.datebox small { font-size: 10px; font-weight: 700; } .datebox b { font-size: 18px; color: var(--ink); }
+.caticon { font-size: 22px; text-align: center; }
+.caticon.big { font-size: 40px; }
+.actrow .mid { min-width: 0; display: grid; }
+.actrow .mid b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.actrow .mid small { color: var(--muted); font-size: 13px; }
+.actrow .right { text-align: right; font-size: 13px; font-weight: 700; max-width: 7.5em; }
+details.totals summary { cursor: pointer; display: flex; justify-content: space-between; gap: 8px; }
+dialog.sheet.full { width: min(100vw, 560px); max-height: 92vh; overflow-y: auto; margin-top: auto; margin-bottom: 0; border-radius: 18px 18px 0 0; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
+@media (min-width: 600px) { dialog.sheet.full { margin: auto; border-radius: 18px; } }
+#exFormBody, #exDetailBody, #stBody { display: grid; gap: 12px; }
+.sheethead { display: flex; align-items: center; gap: 12px; position: sticky; top: -20px; background: var(--surface); padding: 4px 0 8px; z-index: 2; }
+.sheethead h2 { margin: 0; font-size: 20px; }
+.field { display: grid; gap: 4px; font-size: 13px; font-weight: 700; color: var(--muted); min-width: 0; }
+.field input, .field select, .field textarea { width: 100%; min-width: 0; border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 9px 12px; min-height: 42px; font: inherit; color: var(--ink); font-weight: 400; }
+.fsection { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
+.seg.tabs button { flex: 1 1 auto; }
+.breakdown { background: var(--bg); border-radius: 10px; padding: 10px 12px; display: grid; gap: 6px; }
+.breakdown:empty { display: none; }
+.err { margin: 0; color: var(--red); font-weight: 700; font-size: 14px; }
+.items { display: grid; gap: 10px; }
+.itemrow { display: grid; gap: 6px; padding: 8px; border: 1px solid var(--line); border-radius: 10px; }
+.itemline { display: grid; grid-template-columns: 1fr 5.5em auto; gap: 6px; }
+.itemline input { min-width: 0; border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 8px 10px; font: inherit; color: inherit; }
+.thumbs { display: flex; flex-wrap: wrap; gap: 8px; }
+.thumbwrap { position: relative; }
+.thumb.lg { width: 96px; height: 96px; }
+.rmthumb { position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; border-radius: 50%; border: 0; background: var(--ink); color: var(--bg); font-size: 12px; cursor: pointer; }
+.hero { display: flex; gap: 14px; align-items: center; }
+.hero h2 { margin: 0; font-size: 22px; }
+.bigamt { font-family: var(--display); font-size: 30px; font-weight: 800; margin: 0; font-variant-numeric: tabular-nums; }
+.breakrows { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.breakrows li { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.btn.danger { background: var(--red); border-color: var(--red); color: #fff; }
+details.hist summary { cursor: pointer; font-size: 14px; color: var(--muted); font-weight: 700; }
+
 /* ---- House info ---- */
 .info { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; }
 .info dt { color: var(--muted); font-size: 14px; }
@@ -399,33 +455,23 @@ details.adder.inner > summary { display: inline-flex; align-items: center; }
 
     <section class="card">
       <p class="big" id="myBalance">Balances</p>
-      <div class="sechead"><h2 class="sec">Who pays who</h2><p>The fewest payments to square everyone up.</p></div>
-      <ul class="list" id="settleList"></ul>
-      <details class="nets"><summary>Everyone's balance</summary><ul class="mini" id="netList"></ul></details>
+      <ul class="list" id="pairList"></ul>
+      <label class="toggle"><input type="checkbox" id="simplifyToggle"> <span>Simplify debts (fewest payments)</span></label>
+      <div class="btnrow">
+        <button class="btn primary" id="openAddExpense" type="button">＋ Add an expense</button>
+        <button class="btn" id="openSettle" type="button">💸 Settle up</button>
+      </div>
     </section>
 
-    <details class="adder" id="exAdder">
-      <summary class="btn primary bigbtn">＋ Add an expense</summary>
-      <section class="card">
-        <input type="text" id="exDesc" maxlength="60" placeholder="What was it? e.g. Asda shop">
-        <div class="dates">
-          <label>Amount (£)<input type="text" id="exAmount" inputmode="decimal" maxlength="10" placeholder="0.00"></label>
-          <label>Paid by<select id="exPaidBy"></select></label>
-        </div>
-        <div>
-          <p class="label">Who's sharing this?</p>
-          <div class="seg" id="exSplitWho" role="group" aria-label="Who's sharing this"></div>
-          <p class="sharing" id="exSharing"></p>
-        </div>
-        <div class="seg" id="exSplitMode" role="group" aria-label="How to split"></div>
-        <div id="exCustom" class="custom" hidden></div>
-        <label class="photo">
-          <input type="file" id="exReceipt" accept="image/*">
-          <span id="exReceiptLabel">📎 Add receipt photo (optional)</span>
-        </label>
-        <p class="hint" id="exPreview"></p>
-        <button class="btn primary" id="exAdd" type="button">Add expense</button>
-      </section>
+    <section>
+      <div class="acthead"><h2 class="sec">Activity</h2><input type="search" id="actSearch" placeholder="Search expenses" aria-label="Search expenses"></div>
+      <div class="seg" id="actFilter" role="group" aria-label="Filter"></div>
+      <div id="actList"></div>
+    </section>
+
+    <details class="card totals">
+      <summary><b>Totals</b> <span class="hint" id="totalsHint"></span></summary>
+      <div id="totalsBody" class="stack"></div>
     </details>
 
     <section class="card">
@@ -463,10 +509,6 @@ details.adder.inner > summary { display: inline-flex; align-items: center; }
       </details>
     </section>
 
-    <section class="card">
-      <div class="sechead"><h2 class="sec">Activity</h2></div>
-      <ul class="list" id="exList"></ul>
-    </section>
   </main>
 
   <main class="screen" data-screen="house" hidden>
@@ -511,6 +553,10 @@ details.adder.inner > summary { display: inline-flex; align-items: center; }
 
 <dialog class="sheet" id="rotaSheet"><div id="rotaSheetBody"></div>
   <div class="row"><button class="btn primary" id="rotaSave" type="button">Save</button><button class="btn" id="rotaReset" type="button">Reset to normal</button><button class="btn" id="rotaCancel" type="button">Cancel</button></div></dialog>
+
+<dialog class="sheet full" id="exFormSheet"><div id="exFormBody"></div></dialog>
+<dialog class="sheet full" id="exDetailSheet"><div id="exDetailBody"></div></dialog>
+<dialog class="sheet" id="stSheet"><div id="stBody"></div></dialog>
 
 <p class="toast" id="status" role="status" aria-live="polite"></p>
 
@@ -1122,108 +1168,103 @@ function renderHome() {
 
 
 // ---- Money (the house's own Splitwise) ----
-// store.money = { opening: {name: pence}, openingNote, expenses: [{id, desc, amount, paidBy, split: {name: pence}, date, receipt, by, at}],
-//                 settlements: [{id, from, to, amount, date, by, at}] }
+// store.money = {
+//   expenses: [{ id, desc, amount, date, category, notes, paidBy: {name: pence} | "name", split: {name: pence},
+//                splitMode, splitInput, items, receipts: [url], comments: [{id, by, at, text}], history: [{by, at, what}], by, at, carried?, imported? }],
+//   settlements: [{ id, from, to, amount, date, method, note, by, at }] }
+const CATS = [["general", "🧾", "General"], ["groceries", "🛒", "Groceries"], ["household", "🧽", "Household"], ["utilities", "💡", "Utilities"], ["rent", "🏠", "Rent"],
+  ["internet", "📶", "TV / phone / internet"], ["takeaway", "🍕", "Takeaway / eating out"], ["drinks", "🍺", "Drinks"], ["goingout", "🎉", "Going out"], ["transport", "🚕", "Transport"], ["other", "📦", "Other"]];
+const catOf = id => CATS.find(c => c[0] === id) || CATS[0];
 const gbp = p => "£" + (Math.abs(p) / 100).toFixed(2);
 const toPence = v => { const n = Math.round(parseFloat(String(v).replace(/[£,\s]/g, "")) * 100); return Number.isFinite(n) && n > 0 ? n : null; };
+const toNum = v => { const n = parseFloat(String(v).replace(/[£,%\s]/g, "")); return Number.isFinite(n) && n >= 0 ? n : 0; };
+const payersOf = e => typeof e.paidBy === "string" ? { [e.paidBy]: e.amount } : (e.paidBy || {});
+const receiptsOf = e => e.receipts || (e.receipt ? [e.receipt] : []);
+const list = xs => xs.length <= 1 ? xs.join("") : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1];
+const sharingText = parts => parts.length === PEOPLE.length ? "shared by all 4" : parts.length === 1 ? `just ${parts[0]}` : `shared by ${parts.length}: ${list(parts)}`;
+const payerText = e => { const ps = Object.keys(payersOf(e)); return ps.length === 1 ? (ps[0] === me ? "You paid" : `${ps[0]} paid`) : `${list(ps)} paid`; };
+const moneyData = () => store.money || {};
+
+// Split pence across weights so the parts always add up exactly (largest remainder)
+function distribute(total, weights) {
+  const keys = Object.keys(weights), sum = keys.reduce((a, k) => a + weights[k], 0);
+  if (!sum) return {};
+  const raw = keys.map(k => [k, total * weights[k] / sum]), out = Object.fromEntries(raw.map(([k, v]) => [k, Math.floor(v)]));
+  let left = total - Object.values(out).reduce((a, b) => a + b, 0);
+  raw.sort((a, b) => (b[1] % 1) - (a[1] % 1)).forEach(([k]) => { if (left > 0) { out[k]++; left--; } });
+  for (const k of keys) if (!out[k]) delete out[k];
+  return out;
+}
 function nets() {
-  const m = store.money || {}, n = Object.fromEntries(PEOPLE.map(p => [p, 0]));
-  for (const [p, v] of Object.entries(m.opening || {})) n[p] = (n[p] || 0) + v;
-  for (const e of m.expenses || []) { n[e.paidBy] += e.amount; for (const [p, v] of Object.entries(e.split)) n[p] -= v; }
+  const m = moneyData(), n = Object.fromEntries(PEOPLE.map(p => [p, 0]));
+  for (const [p, v] of Object.entries(m.opening || {})) n[p] += v;
+  for (const e of m.expenses || []) { for (const [p, v] of Object.entries(payersOf(e))) n[p] += v; for (const [p, v] of Object.entries(e.split)) n[p] -= v; }
   for (const t of m.settlements || []) { n[t.from] += t.amount; n[t.to] -= t.amount; }
   return n;
 }
 function simplify(n) {
-  const cred = Object.entries(n).filter(([, v]) => v > 0).map(([p, v]) => [p, v]).sort((a, b) => b[1] - a[1]);
+  const cred = Object.entries(n).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).map(x => [...x]);
   const debt = Object.entries(n).filter(([, v]) => v < 0).map(([p, v]) => [p, -v]).sort((a, b) => b[1] - a[1]);
   const out = [];
   while (cred.length && debt.length) {
     const x = Math.min(cred[0][1], debt[0][1]);
     if (x > 0) out.push({ from: debt[0][0], to: cred[0][0], amount: x });
     cred[0][1] -= x; debt[0][1] -= x;
-    if (cred[0][1] === 0) cred.shift(); if (debt[0][1] === 0) debt.shift();
+    if (!cred[0][1]) cred.shift(); if (!debt[0][1]) debt.shift();
   }
   return out;
 }
-function equalSplit(total, people) {
-  const base = Math.floor(total / people.length), rem = total - base * people.length;
-  return Object.fromEntries(people.map((p, i) => [p, base + (i < rem ? 1 : 0)]));
+// Who owes who without simplifying: each share is owed to whoever paid, in proportion
+function pairDebts() {
+  const m = moneyData(), owe = {};
+  const add = (a, b, v) => { if (a === b) return; owe[a + ">" + b] = (owe[a + ">" + b] || 0) + v; };
+  for (const e of m.expenses || []) {
+    const pay = payersOf(e), tot = Object.values(pay).reduce((a, b) => a + b, 0) || 1;
+    for (const [p, share] of Object.entries(e.split)) for (const [q, paid] of Object.entries(pay)) add(p, q, share * paid / tot);
+  }
+  for (const t of m.settlements || []) add(t.from, t.to, -t.amount);
+  if (m.opening) for (const t of simplify(Object.fromEntries(PEOPLE.map(p => [p, m.opening[p] || 0])))) add(t.from, t.to, t.amount);
+  const out = [];
+  for (let i = 0; i < PEOPLE.length; i++) for (let j = i + 1; j < PEOPLE.length; j++) {
+    const a = PEOPLE[i], b = PEOPLE[j], d = Math.round((owe[a + ">" + b] || 0) - (owe[b + ">" + a] || 0));
+    if (d > 0) out.push({ from: a, to: b, amount: d }); else if (d < 0) out.push({ from: b, to: a, amount: -d });
+  }
+  return out;
 }
-let exWho = new Set(PEOPLE), exMode = "equal", exFile = null, confirmSettle = null;
+let simplifyOn = true;
+try { simplifyOn = localStorage.getItem("rota-simplify") !== "0"; } catch (e) {}
+const debtsNow = () => simplifyOn ? simplify(nets()) : pairDebts();
+
+// ---- Money screen ----
+let actQuery = "", actFilter = "all";
 function renderMoney() {
-  const n = nets(), pays = simplify(n);
-  // My balance
+  const n = nets(), debts = debtsNow();
   const mb = $("myBalance"); mb.className = "big";
   if (!me) mb.textContent = "Balances";
-  else if (n[me] < 0) { mb.textContent = `You owe ${gbp(n[me])}`; mb.classList.add("owe"); }
-  else if (n[me] > 0) { mb.textContent = `You're owed ${gbp(n[me])}`; mb.classList.add("owed"); }
-  else mb.textContent = "You're all square";
-  // Who pays who
-  const sl = $("settleList"); sl.textContent = "";
-  if (!pays.length) sl.append(el("li", "empty", "Everyone's square."));
-  for (const t of pays) {
-    const li = el("li"), what = el("div", "what");
-    const wr = el("div", "who-row"); wr.append(avatar(t.from, 28), el("b", null, `${t.from} pays ${t.to}`)); what.append(wr);
-    what.append( el("small", null, t.from === me ? "That's you" : t.to === me ? "Coming to you" : ""));
-    const k = t.from + ">" + t.to, b = el("button", "btn small" + (confirmSettle === k ? " primary" : ""), confirmSettle === k ? `Confirm ${gbp(t.amount)} paid` : "Settle up"); b.type = "button";
-    const nb = t.from !== me ? el("button", "btn small", "👉 Nudge") : null;
-    if (nb) { nb.type = "button"; nb.addEventListener("click", () => nudge("money", t.from)); }
-    b.addEventListener("click", () => {
-      if (confirmSettle !== k) { confirmSettle = k; renderMoney(); return; }
-      confirmSettle = null;
-      const st = { id: uid(), from: t.from, to: t.to, amount: t.amount, date: todayKey(), by: me || null, at: Date.now() };
-      change("money", x => ({ ...x, settlements: [...(x.settlements || []), st] }), `Recorded: ${t.from} paid ${t.to} ${gbp(t.amount)}.`).then(() => fozz({ mode: "settle", id: st.id }));
-    });
-    const actions = el("div", "actions"); actions.append(el("span", "amt", gbp(t.amount))); if (nb) actions.append(nb); actions.append(b);
-    li.append(what, actions); sl.append(li);
-  }
-  const nl = $("netList"); nl.textContent = "";
-  for (const p of PEOPLE) { const li = el("li"); li.append(el("span", "when", p), el("span", "amt " + (n[p] < 0 ? "owe" : n[p] > 0 ? "owed" : ""), n[p] < 0 ? `owes ${gbp(n[p])}` : n[p] > 0 ? `gets back ${gbp(n[p])}` : "square")); nl.append(li); }
+  else if (n[me] < 0) { mb.textContent = `You owe ${gbp(n[me])} overall`; mb.classList.add("owe"); }
+  else if (n[me] > 0) { mb.textContent = `You're owed ${gbp(n[me])} overall`; mb.classList.add("owed"); }
+  else mb.textContent = "You're all settled up";
+  $("simplifyToggle").checked = simplifyOn;
 
-  // Add form
-  const pb = $("exPaidBy"); if (!pb.children.length) PEOPLE.forEach(p => pb.append(new Option(p, p)));
-  if (!pb.dataset.touched) pb.value = me || PEOPLE[0];
-  const who = $("exSplitWho"); who.textContent = "";
-  PEOPLE.forEach(p => { const b = el("button", "btn small", p); b.type = "button"; b.setAttribute("aria-pressed", String(exWho.has(p)));
-    b.addEventListener("click", () => { exWho.has(p) ? exWho.delete(p) : exWho.add(p); renderMoney(); }); who.append(b); });
-  const sharers = PEOPLE.filter(p => exWho.has(p)), amt = toPence($("exAmount").value);
-  $("exSharing").textContent = !sharers.length ? "Pick at least one person." : sharers.length === 1 ? `Only ${sharers[0]} owes this.` :
-    `Shared by ${sharers.length} people: ${list(sharers)}` + (amt && exMode === "equal" ? ` · ${gbp(Math.floor(amt / sharers.length))} each` : "");
-  const mode = $("exSplitMode"); mode.textContent = "";
-  [["equal", "Split equally"], ["custom", "Custom amounts"]].forEach(([id, label]) => { const b = el("button", "btn small", label); b.type = "button"; b.setAttribute("aria-pressed", String(exMode === id));
-    b.addEventListener("click", () => { exMode = id; renderMoney(); }); mode.append(b); });
-  const cu = $("exCustom"); cu.hidden = exMode !== "custom";
-  if (exMode === "custom") {
-    const keep = Object.fromEntries([...cu.querySelectorAll("input")].map(i => [i.dataset.p, i.value]));
-    cu.textContent = "";
-    [...exWho].forEach(p => { const l = el("label", null, p), i = el("input"); i.type = "text"; i.inputMode = "decimal"; i.placeholder = "0.00"; i.dataset.p = p; i.id = "exc-" + p; i.value = keep[p] || ""; i.addEventListener("input", updatePreview); l.append(i); cu.append(l); });
+  const pl = $("pairList"); pl.textContent = "";
+  const mine = debts.filter(d => d.from === me || d.to === me), others = debts.filter(d => d.from !== me && d.to !== me);
+  if (!debts.length) pl.append(el("li", "empty", "Everyone's settled up. 🎉"));
+  for (const d of [...mine, ...others]) {
+    const li = el("li"), what = el("div", "what who-row"), other = d.from === me ? d.to : d.from;
+    what.append(avatar(d.from === me || d.to === me ? other : d.from, 30));
+    const txt = el("span");
+    if (d.from === me) { txt.append(document.createTextNode("You owe "), el("b", null, d.to), document.createTextNode(" "), el("b", "owe", gbp(d.amount))); }
+    else if (d.to === me) { txt.append(el("b", null, d.from), document.createTextNode(" owes you "), el("b", "owed", gbp(d.amount))); }
+    else txt.append(el("b", null, d.from), document.createTextNode(` owes ${d.to} `), el("b", null, gbp(d.amount)));
+    what.append(txt);
+    const act = el("div", "actions");
+    if (d.from !== me) { const nb = el("button", "btn small", "👉 Nudge"); nb.type = "button"; nb.addEventListener("click", () => nudge("money", d.from)); act.append(nb); }
+    const sb = el("button", "btn small", "Settle up"); sb.type = "button"; sb.addEventListener("click", () => openSettle(d)); act.append(sb);
+    li.append(what, act); pl.append(li);
   }
-  updatePreview();
+  renderActivity(); renderTotals();
 
-  // Activity
-  const m = store.money || {}, ul = $("exList"); ul.textContent = "";
-  const items = [...(m.expenses || []).map(e => ({ ...e, kind: "ex" })), ...(m.settlements || []).map(t => ({ ...t, kind: "st" }))].sort((a, b) => b.at - a.at);
-  if (m.opening) items.push({ kind: "open", at: 0 });
-  if (!items.length) ul.append(el("li", "empty", "No expenses yet."));
-  for (const it of items.slice(0, 40)) {
-    const li = el("li"), what = el("div", "what");
-    if (it.kind === "ex") {
-      if (it.receipt) { const a = el("a"); a.href = it.receipt; a.target = "_blank"; a.rel = "noopener"; const img = el("img", "thumb"); img.src = it.receipt; img.alt = "Receipt"; a.append(img); li.append(a); }
-      const parts = Object.keys(it.split), mine = it.split[me];
-      if (it.carried) what.append(el("b", null, `${parts[0]} owes ${it.paidBy} ${gbp(it.amount)}`), el("small", null, "Outstanding from Splitwise"));
-      else what.append(el("b", null, `${it.desc} · ${gbp(it.amount)}`), el("small", null, [`${it.paidBy} paid`, sharingText(parts, it.split), fmtDay(parseDay(it.date)), me && it.paidBy !== me && mine ? `your share ${gbp(mine)}` : ""].filter(Boolean).join(" · ")));
-      li.append(what);
-      if (me && (it.by === me || it.carried)) { const b = el("button", "btn small", it.carried ? "Remove" : "Delete"); b.type = "button"; b.addEventListener("click", () => change("money", x => ({ ...x, expenses: (x.expenses || []).filter(y => y.id !== it.id) }), "Expense deleted.")); li.append(b); }
-    } else if (it.kind === "st") {
-      what.append(el("b", null, `${it.from} paid ${it.to} ${gbp(it.amount)}`), el("small", null, `Settle up · ${fmtDay(parseDay(it.date))}`)); li.append(what);
-      if (me && it.by === me) { const b = el("button", "btn small", "Undo"); b.type = "button"; b.addEventListener("click", () => change("money", x => ({ ...x, settlements: (x.settlements || []).filter(y => y.id !== it.id) }), "Settle up removed.")); li.append(b); }
-    } else {
-      what.append(el("b", null, "Brought over from Splitwise"), el("small", null, m.openingNote || "Balances carried over")); li.append(what);
-    }
-    ul.append(li);
-  }
-
-  // Bills due
+  // Bills due (one-offs)
   const bl = $("billsList"), bills = upcomingBills(); bl.textContent = "";
   if (!bills.length) bl.append(el("li", "empty", "No bills due."));
   for (const e of bills) {
@@ -1235,30 +1276,362 @@ function renderMoney() {
   }
   if (!$("billDate").value) $("billDate").value = todayKey();
 }
-const sharingText = (parts, split) => parts.length === PEOPLE.length ? "shared by all 4" : parts.length === 1 ? `just ${parts[0]}` : `shared by ${parts.length}: ${list(parts)}`;
-const list = xs => xs.length <= 1 ? xs.join("") : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1];
-function currentSplit() {
-  const total = toPence($("exAmount").value), people = PEOPLE.filter(p => exWho.has(p));
-  if (!people.length) return { error: "Pick who it's split between." };
-  if (exMode === "equal") return total ? { total, split: equalSplit(total, people) } : { error: "Enter the amount." };
-  const split = {}; let sum = 0;
-  for (const p of people) { const v = toPence($("exc-" + p)?.value || ""); if (v) { split[p] = v; sum += v; } }
-  if (!sum) return { error: "Enter how much each person owes." };
-  if (total && total !== sum) return { error: `Shares add up to ${gbp(sum)}, not ${gbp(total)}.` };
-  return { total: sum, split };
+function myLine(e) {
+  // Splitwise-style right-hand note: you lent / you borrowed / not involved
+  if (!me) return ["", ""];
+  const paid = payersOf(e)[me] || 0, owe = e.split[me] || 0, net = paid - owe;
+  if (!paid && !owe) return ["not involved", "muted"];
+  if (net > 0) return [`you lent ${gbp(net)}`, "owed"];
+  if (net < 0) return [`you borrowed ${gbp(net)}`, "owe"];
+  return ["you paid your share", "muted"];
 }
-function updatePreview() {
-  const r = currentSplit(), pv = $("exPreview");
-  pv.textContent = r.error && $("exAmount").value ? r.error : r.split ? Object.entries(r.split).map(([p, v]) => `${p} ${gbp(v)}`).join(" · ") : "";
+function renderActivity() {
+  const m = moneyData(), q = actQuery.trim().toLowerCase();
+  const fseg = $("actFilter"); fseg.textContent = "";
+  [["all", "Everything"], ["me", "Involving me"], ["receipts", "With receipts"]].forEach(([id, label]) => {
+    const b = el("button", "btn small", label); b.type = "button"; b.setAttribute("aria-pressed", String(actFilter === id));
+    b.addEventListener("click", () => { actFilter = id; renderActivity(); }); fseg.append(b);
+  });
+  let items = [...(m.expenses || []).map(e => ({ ...e, kind: "ex" })), ...(m.settlements || []).map(t => ({ ...t, kind: "st" }))];
+  items = items.filter(it => {
+    if (actFilter === "me" && me) { if (it.kind === "ex" ? !(payersOf(it)[me] || it.split[me]) : !(it.from === me || it.to === me)) return false; }
+    if (actFilter === "receipts" && !(it.kind === "ex" && receiptsOf(it).length)) return false;
+    if (!q) return true;
+    const hay = it.kind === "ex" ? [it.desc, it.notes, catOf(it.category)[2], ...Object.keys(payersOf(it)), ...Object.keys(it.split)].join(" ") : [it.from, it.to, it.note, "payment settle"].join(" ");
+    return hay.toLowerCase().includes(q);
+  }).sort((a, b) => (b.date || "").localeCompare(a.date || "") || (b.at || 0) - (a.at || 0));
+  const box = $("actList"); box.textContent = "";
+  if (!items.length) { box.append(el("p", "hint", q || actFilter !== "all" ? "Nothing matches." : "No expenses yet. Tap ＋ Add an expense.")); return; }
+  let month = null, ul = null;
+  for (const it of items) {
+    const mk = (it.date || "").slice(0, 7);
+    if (mk !== month) {
+      month = mk;
+      const spent = items.filter(x => x.kind === "ex" && !x.carried && (x.date || "").startsWith(mk)).reduce((a, x) => a + x.amount, 0);
+      const h = el("div", "monthhead"); h.append(el("span", null, parseDay(mk + "-01").toLocaleDateString("en-GB", { month: "long", year: "numeric" })), el("span", null, spent ? `${gbp(spent)} spent` : ""));
+      box.append(h); ul = el("ul", "act"); box.append(ul);
+    }
+    const li = el("li"), btn = el("button", "actrow"); btn.type = "button";
+    const d = parseDay(it.date || todayKey());
+    const dateBox = el("span", "datebox"); dateBox.append(el("small", null, d.toLocaleDateString("en-GB", { month: "short" }).toUpperCase()), el("b", null, String(d.getDate())));
+    const mid = el("span", "mid"), right = el("span", "right");
+    if (it.kind === "ex") {
+      const c = catOf(it.category);
+      btn.append(dateBox, el("span", "caticon", c[1]));
+      mid.append(el("b", null, it.carried ? `Owed from Splitwise` : it.desc), el("small", null, `${payerText(it)} ${gbp(it.amount)}${receiptsOf(it).length ? " · 📎" : ""}${(it.comments || []).length ? ` · 💬${it.comments.length}` : ""}`));
+      const [t, cls] = myLine(it); right.append(el("small", cls, t));
+    } else {
+      btn.append(dateBox, el("span", "caticon", "💸"));
+      mid.append(el("b", null, `${it.from === me ? "You" : it.from} paid ${it.to === me ? "you" : it.to}`), el("small", null, [gbp(it.amount), it.method && it.method !== "Splitwise" ? it.method : "", it.note].filter(Boolean).join(" · ")));
+      right.append(el("small", it.from === me ? "owe" : it.to === me ? "owed" : "muted", it.from === me ? `you paid ${gbp(it.amount)}` : it.to === me ? `you received ${gbp(it.amount)}` : "not involved"));
+    }
+    btn.append(mid, right);
+    btn.addEventListener("click", () => it.kind === "ex" ? openExpenseDetail(it.id) : openSettleDetail(it.id));
+    li.append(btn); ul.append(li);
+  }
 }
-$("exAmount").addEventListener("input", () => { updatePreview(); const sh = PEOPLE.filter(p => exWho.has(p)), a = toPence($("exAmount").value); if (sh.length > 1 && a && exMode === "equal") $("exSharing").textContent = `Shared by ${sh.length} people: ${list(sh)} · ${gbp(Math.floor(a / sh.length))} each`; });
-$("exPaidBy").addEventListener("change", e => { e.target.dataset.touched = "1"; });
-$("exReceipt").addEventListener("change", e => { exFile = e.target.files[0] || null; $("exReceiptLabel").textContent = exFile ? "📎 " + exFile.name : "📎 Add receipt photo (optional)"; });
+function renderTotals() {
+  const m = moneyData(), mk = todayKey().slice(0, 7), exs = (m.expenses || []).filter(e => !e.carried && (e.date || "").startsWith(mk));
+  const total = exs.reduce((a, e) => a + e.amount, 0);
+  $("totalsHint").textContent = `${gbp(total)} spent this month`;
+  const body = $("totalsBody"); body.textContent = "";
+  const byCat = {}; exs.forEach(e => byCat[e.category || "general"] = (byCat[e.category || "general"] || 0) + e.amount);
+  const cl = el("ul", "mini"); Object.entries(byCat).sort((a, b) => b[1] - a[1]).forEach(([c, v]) => { const li = el("li"); li.append(el("span", "when", catOf(c)[1]), el("span", null, `${catOf(c)[2]} · ${gbp(v)}`)); cl.append(li); });
+  body.append(el("p", "label", "This month by category"), exs.length ? cl : el("p", "hint", "Nothing yet this month."));
+  const pp = el("ul", "mini");
+  PEOPLE.forEach(p => { const paid = exs.reduce((a, e) => a + (payersOf(e)[p] || 0), 0), share = exs.reduce((a, e) => a + (e.split[p] || 0), 0); const li = el("li"); li.append(el("span", "when", p), el("span", null, `paid ${gbp(paid)} · share ${gbp(share)}`)); pp.append(li); });
+  body.append(el("p", "label", "This month by person"), pp);
+}
+
+// ---- Add / edit expense ----
+let F = null; // the form being edited
+function blankForm() {
+  return { id: null, desc: "", amount: "", date: todayKey(), category: "general", payMode: "single", payer: me || PEOPLE[0], payers: {},
+    splitMode: "equal", equalWho: new Set(PEOPLE), exact: {}, percent: {}, shares: {}, items: [{ name: "", amount: "", who: new Set(PEOPLE) }], notes: "", receipts: [], files: [] };
+}
+function formFromExpense(e) {
+  const f = blankForm(), pay = payersOf(e), si = e.splitInput || {};
+  Object.assign(f, { id: e.id, desc: e.desc, amount: (e.amount / 100).toFixed(2), date: e.date, category: e.category || "general", notes: e.notes || "", receipts: [...receiptsOf(e)] });
+  const ps = Object.keys(pay);
+  if (ps.length === 1) { f.payMode = "single"; f.payer = ps[0]; } else { f.payMode = "multi"; f.payers = Object.fromEntries(ps.map(p => [p, (pay[p] / 100).toFixed(2)])); }
+  f.splitMode = e.splitMode || "exact";
+  if (f.splitMode === "equal") f.equalWho = new Set(Object.keys(e.split));
+  else if (f.splitMode === "percent") f.percent = si.percent || {};
+  else if (f.splitMode === "shares") f.shares = si.shares || {};
+  else if (f.splitMode === "items") f.items = (e.items || []).map(i => ({ name: i.name, amount: (i.amount / 100).toFixed(2), who: new Set(i.who) }));
+  else { f.splitMode = "exact"; f.exact = Object.fromEntries(Object.entries(e.split).map(([p, v]) => [p, (v / 100).toFixed(2)])); }
+  if (!f.items.length) f.items = [{ name: "", amount: "", who: new Set(PEOPLE) }];
+  return f;
+}
+// Works out each person's share from the form. Returns { split, error, note }
+function computeSplit(f) {
+  const total = toPence(f.amount);
+  if (!total) return { error: "Enter the total amount." };
+  let split = {}, note = "";
+  if (f.splitMode === "equal") {
+    const who = PEOPLE.filter(p => f.equalWho.has(p));
+    if (!who.length) return { error: "Pick who it's for." };
+    split = distribute(total, Object.fromEntries(who.map(p => [p, 1])));
+  } else if (f.splitMode === "exact") {
+    for (const p of PEOPLE) { const v = toPence(f.exact[p] || ""); if (v) split[p] = v; }
+    const sum = Object.values(split).reduce((a, b) => a + b, 0);
+    if (sum !== total) return { error: sum < total ? `${gbp(total - sum)} still to assign` : `${gbp(sum - total)} too much assigned`, split };
+  } else if (f.splitMode === "percent") {
+    const w = {}; for (const p of PEOPLE) { const v = toNum(f.percent[p] || ""); if (v) w[p] = v; }
+    const sum = Object.values(w).reduce((a, b) => a + b, 0);
+    if (Math.abs(sum - 100) > 0.001) return { error: `Percentages add up to ${+sum.toFixed(2)}%, not 100%`, split: distribute(total, w) };
+    split = distribute(total, w);
+  } else if (f.splitMode === "shares") {
+    const w = {}; for (const p of PEOPLE) { const v = toNum(f.shares[p] || ""); if (v) w[p] = v; }
+    if (!Object.keys(w).length) return { error: "Give at least one person a share." };
+    split = distribute(total, w);
+  } else if (f.splitMode === "items") {
+    let assigned = 0; const everyone = new Set();
+    for (const it of f.items) {
+      const v = toPence(it.amount); if (!v) continue;
+      const who = PEOPLE.filter(p => it.who.has(p)); if (!who.length) return { error: `Pick who "${it.name || "an item"}" is for.` };
+      who.forEach(p => everyone.add(p)); assigned += v;
+      for (const [p, s] of Object.entries(distribute(v, Object.fromEntries(who.map(x => [x, 1]))))) split[p] = (split[p] || 0) + s;
+    }
+    if (!assigned) return { error: "Add at least one item with a price." };
+    if (assigned > total) return { error: `Items add up to ${gbp(assigned)}, more than the ${gbp(total)} total.`, split };
+    if (assigned < total) { // leftover (e.g. delivery, bags) shared evenly by everyone on the bill
+      const left = total - assigned, ev = [...everyone];
+      for (const [p, s] of Object.entries(distribute(left, Object.fromEntries(ev.map(x => [x, 1]))))) split[p] = (split[p] || 0) + s;
+      note = `${gbp(left)} not on an item (delivery, bags, etc.) is shared by ${list(ev)}.`;
+    }
+  }
+  return { split, total, note };
+}
+function computePayers(f) {
+  const total = toPence(f.amount);
+  if (f.payMode === "single") return total ? { paidBy: { [f.payer]: total } } : { error: "Enter the total amount." };
+  const pay = {}; for (const p of PEOPLE) { const v = toPence(f.payers[p] || ""); if (v) pay[p] = v; }
+  const sum = Object.values(pay).reduce((a, b) => a + b, 0);
+  if (!sum) return { error: "Enter how much each person paid." };
+  if (total && sum !== total) return { error: `Payments add up to ${gbp(sum)}, not ${gbp(total)}.` };
+  return { paidBy: pay };
+}
+const field = (label, input) => { const l = el("label", "field"); l.append(el("span", null, label), input); return l; };
+const inputEl = (id, value, attrs = {}) => { const i = el("input"); i.id = id; i.type = attrs.type || "text"; i.value = value ?? ""; Object.assign(i, attrs); return i; };
+function openExpenseForm(e) {
+  F = e ? formFromExpense(e) : blankForm();
+  renderExpenseForm();
+  const dlg = $("exFormSheet"); if (!dlg.open) dlg.showModal();
+}
+function renderExpenseForm() {
+  const box = $("exFormBody"); box.textContent = "";
+  const top = el("div", "sheethead"); const cancel = el("button", "btn small", "Cancel"); cancel.type = "button"; cancel.addEventListener("click", () => $("exFormSheet").close());
+  top.append(cancel, el("h2", null, F.id ? "Edit expense" : "Add an expense")); box.append(top);
+
+  // What + how much + when + category
+  const desc = inputEl("fDesc", F.desc, { maxLength: 60, placeholder: "What was it for? e.g. Asda shop" }); desc.addEventListener("input", () => F.desc = desc.value);
+  const amt = inputEl("fAmount", F.amount, { inputMode: "decimal", placeholder: "0.00", maxLength: 10 }); amt.addEventListener("input", () => { F.amount = amt.value; renderBreakdown(); });
+  const date = inputEl("fDate", F.date, { type: "date" }); date.addEventListener("input", () => F.date = date.value);
+  const cat = el("select"); cat.id = "fCat"; CATS.forEach(([id, ic, label]) => cat.append(new Option(`${ic} ${label}`, id))); cat.value = F.category; cat.addEventListener("change", () => F.category = cat.value);
+  const g1 = el("div", "dates"); g1.append(field("Amount (£)", amt), field("Date", date));
+  box.append(field("Description", desc), g1, field("Category", cat));
+
+  // Paid by
+  const pbox = el("div", "fsection"); pbox.append(el("p", "label", "Paid by"));
+  const pseg = el("div", "seg");
+  PEOPLE.forEach(p => { const b = el("button", "btn small", p === me ? `${p} (you)` : p); b.type = "button"; b.setAttribute("aria-pressed", String(F.payMode === "single" && F.payer === p)); b.addEventListener("click", () => { F.payMode = "single"; F.payer = p; renderExpenseForm(); }); pseg.append(b); });
+  const mb = el("button", "btn small", "Several people"); mb.type = "button"; mb.setAttribute("aria-pressed", String(F.payMode === "multi")); mb.addEventListener("click", () => { F.payMode = "multi"; renderExpenseForm(); }); pseg.append(mb);
+  pbox.append(pseg);
+  if (F.payMode === "multi") {
+    const grid = el("div", "custom");
+    PEOPLE.forEach(p => { const i = inputEl("fPay-" + p, F.payers[p] || "", { inputMode: "decimal", placeholder: "0.00" }); i.addEventListener("input", () => { F.payers[p] = i.value; renderBreakdown(); }); const l = el("label", null, p); l.append(i); grid.append(l); });
+    pbox.append(grid);
+  }
+  box.append(pbox);
+
+  // Who it's for / how it's split
+  const sbox = el("div", "fsection"); sbox.append(el("p", "label", "Who's it for, and how is it split?"));
+  const mseg = el("div", "seg tabs");
+  [["equal", "Equally"], ["exact", "Exact £"], ["percent", "%"], ["shares", "Shares"], ["items", "By item"]].forEach(([id, label]) => { const b = el("button", "btn small", label); b.type = "button"; b.setAttribute("aria-pressed", String(F.splitMode === id)); b.addEventListener("click", () => { F.splitMode = id; renderExpenseForm(); }); mseg.append(b); });
+  sbox.append(mseg);
+  if (F.splitMode === "equal") {
+    const seg = el("div", "seg");
+    PEOPLE.forEach(p => { const b = el("button", "btn small", p); b.type = "button"; b.setAttribute("aria-pressed", String(F.equalWho.has(p))); b.addEventListener("click", () => { F.equalWho.has(p) ? F.equalWho.delete(p) : F.equalWho.add(p); renderExpenseForm(); }); seg.append(b); });
+    sbox.append(seg);
+  } else if (F.splitMode === "items") {
+    const wrap = el("div", "items");
+    F.items.forEach((it, idx) => {
+      const row = el("div", "itemrow");
+      const nm = inputEl(`fItemName-${idx}`, it.name, { placeholder: "Item, e.g. Milk", maxLength: 40 }); nm.addEventListener("input", () => it.name = nm.value);
+      const pr = inputEl(`fItemAmt-${idx}`, it.amount, { inputMode: "decimal", placeholder: "£", maxLength: 8 }); pr.addEventListener("input", () => { it.amount = pr.value; renderBreakdown(); });
+      const rm = el("button", "btn small", "✕"); rm.type = "button"; rm.setAttribute("aria-label", "Remove item"); rm.addEventListener("click", () => { F.items.splice(idx, 1); if (!F.items.length) F.items.push({ name: "", amount: "", who: new Set(PEOPLE) }); renderExpenseForm(); });
+      const line = el("div", "itemline"); line.append(nm, pr, rm);
+      const seg = el("div", "seg"); PEOPLE.forEach(p => { const b = el("button", "btn small", p); b.type = "button"; b.setAttribute("aria-pressed", String(it.who.has(p))); b.addEventListener("click", () => { it.who.has(p) ? it.who.delete(p) : it.who.add(p); renderExpenseForm(); }); seg.append(b); });
+      row.append(line, seg); wrap.append(row);
+    });
+    const add = el("button", "btn small", "＋ Add item"); add.type = "button"; add.addEventListener("click", () => { F.items.push({ name: "", amount: "", who: new Set(PEOPLE) }); renderExpenseForm(); });
+    wrap.append(add); sbox.append(wrap);
+  } else {
+    const grid = el("div", "custom"), bag = F.splitMode === "exact" ? F.exact : F.splitMode === "percent" ? F.percent : F.shares;
+    const ph = F.splitMode === "exact" ? "0.00" : F.splitMode === "percent" ? "%" : "0";
+    PEOPLE.forEach(p => { const i = inputEl(`fSplit-${p}`, bag[p] || "", { inputMode: "decimal", placeholder: ph }); i.addEventListener("input", () => { bag[p] = i.value; renderBreakdown(); }); const l = el("label", null, p); l.append(i); grid.append(l); });
+    sbox.append(grid);
+  }
+  sbox.append(el("div", "breakdown", null)); box.append(sbox);
+
+  // Notes + receipts
+  const notes = el("textarea"); notes.id = "fNotes"; notes.rows = 2; notes.maxLength = 300; notes.placeholder = "Notes (optional)"; notes.value = F.notes; notes.addEventListener("input", () => F.notes = notes.value);
+  box.append(field("Notes", notes));
+  const rbox = el("div", "fsection"); rbox.append(el("p", "label", "Receipts / evidence"));
+  const thumbs = el("div", "thumbs");
+  F.receipts.forEach((u, i) => { const t = el("span", "thumbwrap"); const img = el("img", "thumb"); img.src = u; img.alt = "Receipt"; const x = el("button", "rmthumb", "✕"); x.type = "button"; x.setAttribute("aria-label", "Remove receipt"); x.addEventListener("click", () => { F.receipts.splice(i, 1); renderExpenseForm(); }); t.append(img, x); thumbs.append(t); });
+  F.files.forEach((f, i) => { const t = el("span", "thumbwrap"); const img = el("img", "thumb"); img.src = URL.createObjectURL(f); img.alt = "New receipt"; const x = el("button", "rmthumb", "✕"); x.type = "button"; x.addEventListener("click", () => { F.files.splice(i, 1); renderExpenseForm(); }); t.append(img, x); thumbs.append(t); });
+  const pick = el("label", "photo"); const fi = el("input"); fi.type = "file"; fi.accept = "image/*"; fi.multiple = true; fi.id = "fFiles";
+  fi.addEventListener("change", () => { F.files.push(...fi.files); renderExpenseForm(); });
+  pick.append(fi, el("span", null, "📎 Add photos of the receipt"));
+  rbox.append(thumbs, pick); box.append(rbox);
+
+  const save = el("button", "btn primary bigbtn", F.id ? "Save changes" : "Add expense"); save.type = "button"; save.id = "fSave";
+  save.addEventListener("click", saveExpense); box.append(save);
+  renderBreakdown();
+}
+function renderBreakdown() {
+  const bd = $("exFormBody").querySelector(".breakdown"); if (!bd) return;
+  bd.textContent = "";
+  const r = computeSplit(F), pr = computePayers(F);
+  if (r.split && Object.keys(r.split).length) {
+    const ul = el("ul", "mini");
+    PEOPLE.filter(p => r.split[p]).forEach(p => { const li = el("li"); li.append(el("span", "when", p), el("span", "amt", gbp(r.split[p]))); ul.append(li); });
+    const who = PEOPLE.filter(p => r.split[p]);
+    bd.append(el("p", "sharing", `For ${who.length === PEOPLE.length ? "everyone" : who.length === 1 ? "just " + who[0] : `${who.length} people: ${list(who)}`}`), ul);
+  }
+  if (r.note) bd.append(el("p", "hint", r.note));
+  if (r.error) bd.append(el("p", "err", r.error));
+  if (pr.error && F.payMode === "multi") bd.append(el("p", "err", pr.error));
+}
+async function saveExpense() {
+  const desc = F.desc.trim(); if (!desc) { say("Say what it was for."); $("fDesc").focus(); return; }
+  const r = computeSplit(F); if (r.error) { say(r.error); return; }
+  const pr = computePayers(F); if (pr.error) { say(pr.error); return; }
+  const btn = $("fSave"); btn.disabled = true; btn.textContent = F.files.length ? "Uploading receipts…" : "Saving…";
+  try {
+    const uploaded = [];
+    for (const f of F.files) uploaded.push(await uploadReceipt(f));
+    const splitInput = F.splitMode === "percent" ? { percent: F.percent } : F.splitMode === "shares" ? { shares: F.shares } : null;
+    const items = F.splitMode === "items" ? F.items.filter(i => toPence(i.amount)).map(i => ({ name: i.name.trim() || "Item", amount: toPence(i.amount), who: PEOPLE.filter(p => i.who.has(p)) })) : null;
+    const base = { desc, amount: r.total, date: F.date || todayKey(), category: F.category, notes: F.notes.trim(), paidBy: pr.paidBy, split: r.split, splitMode: F.splitMode, splitInput, items, receipts: [...F.receipts, ...uploaded] };
+    const now = Date.now(), editing = F.id;
+    let id = editing;
+    const ok = await change("money", x => {
+      const exs = [...(x.expenses || [])];
+      if (editing) {
+        const i = exs.findIndex(e => e.id === editing);
+        if (i < 0) return x;
+        exs[i] = { ...exs[i], ...base, carried: false, editedBy: me || null, editedAt: now, history: [...(exs[i].history || []), { by: me || null, at: now, what: "edited" }] };
+      } else {
+        id = uid();
+        exs.push({ id, ...base, comments: [], history: [{ by: me || null, at: now, what: "added" }], by: me || null, at: now });
+      }
+      return { ...x, expenses: exs };
+    }, editing ? `${desc} updated.` : `${desc} added. Everyone involved gets told.`);
+    if (ok) { fozz({ mode: "expense", id, rev: editing ? now : 0 }); $("exFormSheet").close(); }
+  } catch (e) { say("Couldn't upload a receipt. Try a smaller photo, or save without it."); }
+  finally { btn.disabled = false; btn.textContent = F && F.id ? "Save changes" : "Add expense"; }
+}
+
+// ---- Expense details: breakdown, receipts, comments, history ----
+let detailId = null, confirmDel = false;
+function openExpenseDetail(id) { detailId = id; confirmDel = false; renderExpenseDetail(); const d = $("exDetailSheet"); if (!d.open) d.showModal(); }
+function renderExpenseDetail() {
+  const e = (moneyData().expenses || []).find(x => x.id === detailId), box = $("exDetailBody"); box.textContent = "";
+  const top = el("div", "sheethead"); const close = el("button", "btn small", "Close"); close.type = "button"; close.addEventListener("click", () => $("exDetailSheet").close());
+  top.append(close); box.append(top);
+  if (!e) { box.append(el("p", "hint", "This expense has been deleted.")); return; }
+  const c = catOf(e.category), pay = payersOf(e);
+  const hero = el("div", "hero"); hero.append(el("span", "caticon big", c[1]));
+  const ht = el("div"); ht.append(el("h2", null, e.carried ? "Owed from Splitwise" : e.desc), el("p", "bigamt", gbp(e.amount)), el("p", "hint", `${fmtDay(parseDay(e.date))} · ${c[2]}`)); hero.append(ht);
+  box.append(hero);
+  const by = e.imported ? "Imported from Splitwise" : e.carried ? "Brought over from Splitwise" : `Added by ${e.by || "someone"} · ${fmtWhen(e.at)}${e.editedAt ? ` · edited by ${e.editedBy || "someone"} ${fmtWhen(e.editedAt)}` : ""}`;
+  box.append(el("p", "hint", by));
+  const brk = el("ul", "breakrows");
+  for (const p of PEOPLE) {
+    const paid = pay[p] || 0, owe = e.split[p] || 0; if (!paid && !owe) continue;
+    const li = el("li"), l = el("span", "who-row"); l.append(avatar(p, 28), el("span", null, p === me ? `${p} (you)` : p));
+    const parts = []; if (paid) parts.push(`paid ${gbp(paid)}`); if (owe) parts.push(`owes ${gbp(owe)}`);
+    li.append(l, el("span", "amt", parts.join(" · "))); brk.append(li);
+  }
+  box.append(el("p", "label", `${payerText(e)} · ${sharingText(Object.keys(e.split))}`), brk);
+  if (e.items?.length) { const il = el("ul", "mini"); e.items.forEach(i => { const li = el("li"); li.append(el("span", "when", gbp(i.amount)), el("span", null, `${i.name} · ${i.who.length === PEOPLE.length ? "everyone" : list(i.who)}`)); il.append(li); }); box.append(el("p", "label", "Items"), il); }
+  if (e.notes) box.append(el("p", "label", "Notes"), el("p", null, e.notes));
+  const rs = receiptsOf(e);
+  if (rs.length) { const th = el("div", "thumbs"); rs.forEach(u => { const a = el("a"); a.href = u; a.target = "_blank"; a.rel = "noopener"; const img = el("img", "thumb lg"); img.src = u; img.alt = "Receipt"; a.append(img); th.append(a); }); box.append(el("p", "label", "Receipts"), th); }
+  // Comments
+  box.append(el("p", "label", "Comments"));
+  const cl = el("ul", "list"); (e.comments || []).forEach(cm => { const li = el("li"), w = el("div", "what"); w.append(el("b", null, cm.text), el("small", null, `${cm.by || "Someone"} · ${fmtWhen(cm.at)}`)); li.append(w); cl.append(li); });
+  if (!(e.comments || []).length) cl.append(el("li", "empty", "No comments yet."));
+  const cin = inputEl("cmInput", "", { placeholder: me ? "Add a comment" : "Pick who you are first", maxLength: 200 }); cin.disabled = !me;
+  const cb = el("button", "btn small", "Post"); cb.type = "button"; cb.disabled = !me;
+  cb.addEventListener("click", async () => { const t = cin.value.trim(); if (!t) return; const cm = { id: uid(), by: me, at: Date.now(), text: t };
+    const ok = await change("money", x => ({ ...x, expenses: (x.expenses || []).map(y => y.id === e.id ? { ...y, comments: [...(y.comments || []), cm] } : y) }), "Comment posted.");
+    if (ok) { fozz({ mode: "excomment", id: e.id, cid: cm.id }); renderExpenseDetail(); } });
+  const crow = el("div", "row"); crow.append(cin, cb); box.append(cl, crow);
+  if ((e.history || []).length) { const hl = el("ul", "mini"); e.history.forEach(h => { const li = el("li"); li.append(el("span", "when", fmtWhen(h.at).split(" ")[0]), el("span", null, `${h.what} by ${h.by || "someone"}`)); hl.append(li); }); box.append(el("details", "hist")); box.lastChild.append(el("summary", null, "History"), hl); }
+  // Actions
+  const row = el("div", "btnrow");
+  const ed = el("button", "btn", "✏️ Edit"); ed.type = "button"; ed.addEventListener("click", () => { $("exDetailSheet").close(); openExpenseForm(e); });
+  const del = el("button", "btn" + (confirmDel ? " danger" : ""), confirmDel ? "Tap again to delete" : "🗑 Delete"); del.type = "button";
+  del.addEventListener("click", async () => { if (!confirmDel) { confirmDel = true; renderExpenseDetail(); return; }
+    const ok = await change("money", x => ({ ...x, expenses: (x.expenses || []).filter(y => y.id !== e.id) }), `${e.desc} deleted.`); if (ok) $("exDetailSheet").close(); });
+  row.append(ed, del); box.append(row);
+}
+
+// ---- Settle up ----
+let ST = null;
+function openSettle(d) {
+  const mineDebt = d || debtsNow().find(x => x.from === me) || debtsNow()[0] || { from: me || PEOPLE[0], to: PEOPLE.find(p => p !== (me || PEOPLE[0])), amount: 0 };
+  ST = { id: null, from: mineDebt.from, to: mineDebt.to, amount: mineDebt.amount ? (mineDebt.amount / 100).toFixed(2) : "", method: "Bank transfer", note: "", date: todayKey() };
+  renderSettle(); const s = $("stSheet"); if (!s.open) s.showModal();
+}
+function renderSettle() {
+  const box = $("stBody"); box.textContent = "";
+  box.append(el("h2", null, "Settle up"), el("p", "hint", "Record money paid back. Part-payments are fine."));
+  const sel = (id, v) => { const s = el("select"); s.id = id; PEOPLE.forEach(p => s.append(new Option(p === me ? `${p} (you)` : p, p))); s.value = v; return s; };
+  const from = sel("stFrom", ST.from), to = sel("stTo", ST.to);
+  from.addEventListener("change", () => { ST.from = from.value; suggest(); }); to.addEventListener("change", () => { ST.to = to.value; suggest(); });
+  const amt = inputEl("stAmount", ST.amount, { inputMode: "decimal", placeholder: "0.00" }); amt.addEventListener("input", () => ST.amount = amt.value);
+  const g = el("div", "dates"); g.append(field("Who paid", from), field("Paid to", to));
+  const g2 = el("div", "dates"); const date = inputEl("stDate", ST.date, { type: "date" }); date.addEventListener("input", () => ST.date = date.value); g2.append(field("Amount (£)", amt), field("Date", date));
+  const mseg = el("div", "seg"); ["Bank transfer", "Cash", "Other"].forEach(m => { const b = el("button", "btn small", m); b.type = "button"; b.setAttribute("aria-pressed", String(ST.method === m)); b.addEventListener("click", () => { ST.method = m; renderSettle(); }); mseg.append(b); });
+  const note = inputEl("stNote", ST.note, { placeholder: "Note (optional)", maxLength: 80 }); note.addEventListener("input", () => ST.note = note.value);
+  const owed = (debtsNow().find(x => x.from === ST.from && x.to === ST.to) || {}).amount;
+  box.append(g, g2, el("p", "hint", owed ? `${ST.from} currently owes ${ST.to} ${gbp(owed)}.` : `${ST.from} doesn't currently owe ${ST.to} anything.`), mseg, note);
+  const row = el("div", "btnrow");
+  const save = el("button", "btn primary", "Record payment"); save.type = "button";
+  save.addEventListener("click", async () => {
+    const a = toPence(ST.amount); if (!a) { say("Enter the amount paid."); return; }
+    if (ST.from === ST.to) { say("Pick two different people."); return; }
+    const t = { id: uid(), from: ST.from, to: ST.to, amount: a, date: ST.date || todayKey(), method: ST.method, note: ST.note.trim(), by: me || null, at: Date.now() };
+    const ok = await change("money", x => ({ ...x, settlements: [...(x.settlements || []), t] }), `Recorded: ${t.from} paid ${t.to} ${gbp(a)}.`);
+    if (ok) { fozz({ mode: "settle", id: t.id }); $("stSheet").close(); }
+  });
+  const cancel = el("button", "btn", "Cancel"); cancel.type = "button"; cancel.addEventListener("click", () => $("stSheet").close());
+  row.append(save, cancel); box.append(row);
+  function suggest() { const o = (debtsNow().find(x => x.from === ST.from && x.to === ST.to) || {}).amount; if (o) ST.amount = (o / 100).toFixed(2); renderSettle(); }
+}
+function openSettleDetail(id) {
+  const t = (moneyData().settlements || []).find(x => x.id === id); if (!t) return;
+  const box = $("stBody"); box.textContent = "";
+  box.append(el("h2", null, `${t.from} paid ${t.to}`), el("p", "bigamt", gbp(t.amount)), el("p", "hint", [fmtDay(parseDay(t.date)), t.method, t.note, t.by ? `recorded by ${t.by}` : ""].filter(Boolean).join(" · ")));
+  const row = el("div", "btnrow");
+  const del = el("button", "btn", "🗑 Delete payment"); del.type = "button";
+  del.addEventListener("click", async () => { const ok = await change("money", x => ({ ...x, settlements: (x.settlements || []).filter(y => y.id !== id) }), "Payment deleted."); if (ok) $("stSheet").close(); });
+  const close = el("button", "btn", "Close"); close.type = "button"; close.addEventListener("click", () => $("stSheet").close());
+  row.append(del, close); box.append(row);
+  const s = $("stSheet"); if (!s.open) s.showModal();
+}
+
+// ---- Receipt uploads ----
 async function shrinkImage(file) {
-  const img = await createImageBitmap(file), scale = Math.min(1, 1400 / Math.max(img.width, img.height));
+  const img = await createImageBitmap(file), scale = Math.min(1, 1600 / Math.max(img.width, img.height));
   const c = document.createElement("canvas"); c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
   c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-  return await new Promise(r => c.toBlob(r, "image/jpeg", 0.8));
+  return await new Promise(r => c.toBlob(r, "image/jpeg", 0.82));
 }
 async function uploadReceipt(file) {
   const blob = await shrinkImage(file), path = `${todayKey()}/${uid()}.jpg`;
@@ -1266,20 +1639,11 @@ async function uploadReceipt(file) {
   if (!r.ok) throw new Error("upload " + r.status);
   return `${SUPABASE_URL}/storage/v1/object/public/receipts/${path}`;
 }
-$("exAdd").addEventListener("click", async () => {
-  const desc = $("exDesc").value.trim(); if (!desc) { say("Say what the expense was."); return; }
-  const r = currentSplit(); if (r.error) { say(r.error); return; }
-  const btn = $("exAdd"); btn.disabled = true; btn.textContent = exFile ? "Uploading receipt…" : "Adding…";
-  try {
-    const receipt = exFile ? await uploadReceipt(exFile) : null;
-    const ex = { id: uid(), desc, amount: r.total, paidBy: $("exPaidBy").value, split: r.split, date: todayKey(), receipt, by: me || null, at: Date.now() };
-    await change("money", x => ({ ...x, expenses: [...(x.expenses || []), ex] }), `${desc} added. Everyone involved gets a heads-up.`);
-    fozz({ mode: "expense", id: ex.id });
-    $("exDesc").value = ""; $("exAmount").value = ""; $("exReceipt").value = ""; exFile = null; $("exReceiptLabel").textContent = "📎 Add receipt photo (optional)";
-    $("exCustom").textContent = ""; exWho = new Set(PEOPLE); exMode = "equal"; delete $("exPaidBy").dataset.touched; $("exAdder").open = false; renderMoney();
-  } catch (e) { say("Couldn't upload the receipt. Try a smaller photo or add it without one."); }
-  finally { btn.disabled = false; btn.textContent = "Add expense"; }
-});
+
+$("openAddExpense").addEventListener("click", () => openExpenseForm(null));
+$("openSettle").addEventListener("click", () => openSettle(null));
+$("simplifyToggle").addEventListener("change", e => { simplifyOn = e.target.checked; try { localStorage.setItem("rota-simplify", simplifyOn ? "1" : "0"); } catch (err) {} renderMoney(); });
+$("actSearch").addEventListener("input", e => { actQuery = e.target.value; renderActivity(); });
 const upcomingBills = () => (store.calendar?.events || []).filter(e => e.type === "bill" && e.start >= todayKey()).sort((a, b) => a.start.localeCompare(b.start));
 $("billAdd").addEventListener("click", () => {
   const title = $("billTitle").value.trim(), start = $("billDate").value, amount = $("billAmount").value.trim();
