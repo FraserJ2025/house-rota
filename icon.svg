@@ -1,1 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180"><rect width="180" height="180" rx="40" fill="#0f7c86"/><path d="M90 38 40 80v62h36v-36h28v36h36V80z" fill="#fff"/><circle cx="132" cy="52" r="18" fill="#f2c230"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#0f7c86"/>
+  <path d="M256 104 92 236v176h112V306h104v106h112V236z" fill="#ffffff"/>
+  <rect x="226" y="320" width="60" height="92" rx="8" fill="#f2c230"/>
+  <circle cx="274" cy="368" r="6" fill="#3d2f00"/>
+  <path d="M352 132h40v64l-40-32z" fill="#ffffff"/>
+  <text x="256" y="280" font-family="Avenir Next, Helvetica, Arial" font-weight="800" font-size="74" fill="#0f7c86" text-anchor="middle">E</text>
+</svg>

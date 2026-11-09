@@ -70,7 +70,7 @@ function overdueFor(store: Record<string, any>, now: ReturnType<typeof london>) 
   return out;
 }
 
-type Msg = { person: string; title: string; body: string; url: string; tag: string };
+type Msg = { person: string; title: string; body: string; url: string; tag: string; icon?: string };
 
 async function compute(now = london()): Promise<Msg[]> {
   const { data: rows } = await db.from("rota").select("key,data");
@@ -139,7 +139,7 @@ async function deliver(msgs: Msg[], onlyEndpoint?: string) {
   let sent = 0, failed = 0;
   for (const m of msgs) for (const s of (subs || []) as any[]) {
     if (onlyEndpoint ? s.endpoint !== onlyEndpoint : s.person !== m.person) continue;
-    try { await webpush.sendNotification(s.sub, JSON.stringify(m), { TTL: 6 * 3600 }); sent++; }
+    try { await webpush.sendNotification(s.sub, JSON.stringify({ icon: APP + "fozzfather-192.png", ...m }), { TTL: 6 * 3600 }); sent++; }
     catch (e: any) {
       failed++;
       if (e?.statusCode === 404 || e?.statusCode === 410) await db.from("push_subs").delete().eq("endpoint", s.endpoint);
@@ -187,6 +187,19 @@ Deno.serve(async req => {
       }
     }
     await db.from("rota").upsert({ key: "fozz:items", data: { ids: [...done, dkey].slice(-300) } });
+    return json(await deliver(msgs));
+  }
+
+  // Chat message: tell everyone in the chat except the sender, with the sender's photo as the icon
+  if (body.mode === "message" && typeof body.id === "string") {
+    const { data: msg } = await db.from("messages").select("id,chat,sender,body").eq("id", body.id).maybeSingle();
+    if (!msg) return json({ error: "not found" }, 404);
+    const { data: prow } = await db.from("rota").select("data").eq("key", "profiles").maybeSingle();
+    const photo = prow?.data?.[msg.sender]?.photo;
+    const isGroup = msg.chat === "everard-fc";
+    const to = isGroup ? PEOPLE.filter(p => p !== msg.sender) : String(msg.chat).replace(/^dm-/, "").split("-").filter(p => p !== msg.sender && PEOPLE.includes(p));
+    const msgs = to.map(p => ({ person: p, title: isGroup ? `${msg.sender} · Everard FC` : msg.sender, body: String(msg.body).slice(0, 180),
+      url: APP + "#chat-" + msg.chat, tag: "chat-" + msg.chat, icon: photo || APP + "icon-192.png" }));
     return json(await deliver(msgs));
   }
 

@@ -7,9 +7,10 @@ self.addEventListener("push", e => {
   try { d = e.data ? e.data.json() : {}; } catch (err) { d = { body: e.data ? e.data.text() : "" }; }
   e.waitUntil(self.registration.showNotification(d.title || "The Fozzfather", {
     body: d.body || "",
-    icon: "icon-180.png",
-    badge: "icon-180.png",
+    icon: d.icon || "fozzfather-192.png",
+    badge: "icon-192.png",
     tag: d.tag || undefined,
+    renotify: !!d.tag,
     data: { url: d.url || "./#home" }
   }));
 });

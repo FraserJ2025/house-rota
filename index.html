@@ -129,7 +129,7 @@ details p { margin: 8px 0 0; }
 /* ---- App shell: screens + bottom tab bar ---- */
 .wrap { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); display: block; }
 .screen { display: grid; gap: 22px; }
-.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: grid; grid-template-columns: repeat(5, 1fr);
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: grid; grid-template-columns: repeat(6, 1fr);
   background: var(--surface); border-top: 1px solid var(--line);
   padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
 .tabbar a { position: relative; display: grid; justify-items: center; gap: 2px; padding: 6px 0; text-decoration: none; color: var(--muted); font-size: 11px; font-weight: 700; border-radius: 10px; }
@@ -322,6 +322,40 @@ dialog.sheet.full { width: min(100vw, 560px); max-height: 92vh; overflow-y: auto
 .btn.danger { background: var(--red); border-color: var(--red); color: #fff; }
 details.hist summary { cursor: pointer; font-size: 14px; color: var(--muted); font-weight: 700; }
 
+/* ---- Chat ---- */
+.tabbar a { font-size: 10.5px; }
+.tabbar .badge, .badge.inline { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--red); color: #fff; font-size: 11px; font-style: normal; font-weight: 800; display: inline-grid; place-items: center; }
+.tabbar .badge { position: absolute; top: 2px; left: calc(50% + 6px); border: 2px solid var(--surface); }
+.chatlist { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.chatlist li + li { border-top: 1px solid var(--line); }
+.chatrow { display: grid; grid-template-columns: 46px 1fr auto; gap: 12px; align-items: center; width: 100%; padding: 12px; border: 0; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.chatrow:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+.chatrow .mid { min-width: 0; display: grid; }
+.chatrow .mid small { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+.chatrow .right { display: grid; justify-items: end; gap: 4px; color: var(--muted); font-size: 12px; }
+.crest { width: 46px; height: 46px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-size: 24px; }
+.crest.sm { width: 32px; height: 32px; font-size: 17px; }
+#chatView { display: grid; gap: 0; }
+.chathead { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; align-items: center; gap: 10px; padding: 8px 52px 10px 0; background: var(--bg); border-bottom: 1px solid var(--line); }
+.chathead b { font-family: var(--display); font-size: 19px; }
+.msgs { display: grid; align-content: end; gap: 4px; padding: 12px 0 calc(86px + env(safe-area-inset-bottom, 0px)); min-height: 50vh; }
+.dayline { text-align: center; font-size: 12px; color: var(--muted); font-weight: 700; margin: 10px 0 4px; }
+.msg { display: flex; align-items: flex-end; gap: 6px; max-width: 86%; }
+.msg.mine { margin-left: auto; flex-direction: row-reverse; }
+.avsp { width: 28px; flex: none; }
+.bubble { background: var(--surface); border: 1px solid var(--line); border-radius: 16px 16px 16px 4px; padding: 7px 11px 5px; display: grid; min-width: 0; }
+.msg.mine .bubble { background: var(--accent); border-color: var(--accent); color: #fff; border-radius: 16px 16px 4px 16px; }
+.bubble .from { font-weight: 800; font-size: 12px; color: var(--accent); }
+.bubble .text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.bubble .time { justify-self: end; font-size: 10.5px; opacity: .7; }
+.msg.pending { opacity: .6; }
+.hint.center { text-align: center; padding: 30px 0; }
+.composer { position: fixed; left: 0; right: 0; bottom: calc(66px + env(safe-area-inset-bottom, 0px)); z-index: 19; display: flex; gap: 8px; background: var(--bg); border-top: 1px solid var(--line);
+  padding: 8px max(12px, env(safe-area-inset-right, 0px)) 8px max(12px, env(safe-area-inset-left, 0px)); }
+.composer input { flex: 1; min-width: 0; border: 1px solid var(--line); background: var(--surface); border-radius: 22px; padding: 10px 14px; font: inherit; color: inherit; min-height: 44px; }
+.composer input:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+.composer .btn { border-radius: 22px; }
+
 /* ---- House info ---- */
 .info { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; }
 .info dt { color: var(--muted); font-size: 14px; }
@@ -351,6 +385,7 @@ details.hist summary { cursor: pointer; font-size: 14px; color: var(--muted); fo
     <section class="card" id="homeJobs"></section>
     <section class="card tap" id="homeHouse" data-go="rota"></section>
     <section class="card tap" id="homeCal" data-go="calendar"></section>
+    <section class="card tap" id="homeChat" data-go="chat"></section>
     <section class="card tap" id="homeMoney" data-go="money"></section>
     <section class="card tap" id="homeLow" data-go="house"></section>
   </main>
@@ -511,6 +546,25 @@ details.hist summary { cursor: pointer; font-size: 14px; color: var(--muted); fo
 
   </main>
 
+  <main class="screen" data-screen="chat" hidden>
+    <div id="chatListView" class="stack">
+      <header><span class="eyebrow">Messages</span><h1>Chat</h1></header>
+      <ul class="chatlist" id="chatList"></ul>
+      <p class="hint">Everyone gets a notification from the Fozzfather when a message comes in (once they've tapped the 🔔).</p>
+    </div>
+    <div id="chatView" hidden>
+      <div class="chathead">
+        <button class="btn small" id="chatBack" type="button" aria-label="Back to chats">‹ Back</button>
+        <span id="chatHeadAv"></span><b id="chatTitle">Chat</b>
+      </div>
+      <div class="msgs" id="msgList" aria-live="polite"></div>
+      <form class="composer" id="composer">
+        <input type="text" id="msgInput" maxlength="2000" placeholder="Message" autocomplete="off" aria-label="Message">
+        <button class="btn primary" id="msgSend" type="submit">Send</button>
+      </form>
+    </div>
+  </main>
+
   <main class="screen" data-screen="house" hidden>
     <header><span class="eyebrow">The house</span><h1>House</h1></header>
     <section class="card">
@@ -565,6 +619,7 @@ details.hist summary { cursor: pointer; font-size: 14px; color: var(--muted); fo
   <a href="#rota" data-tab="rota"><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg><span>Rota</span><i class="dot" id="rotaDot" hidden></i></a>
   <a href="#calendar" data-tab="calendar"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Calendar</span></a>
   <a href="#money" data-tab="money"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg><span>Money</span></a>
+  <a href="#chat" data-tab="chat"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg><span>Chat</span><i class="badge" id="chatBadge" hidden></i></a>
   <a href="#house" data-tab="house"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg><span>House</span></a>
 </nav>
 
@@ -573,6 +628,7 @@ details.hist summary { cursor: pointer; font-size: 14px; color: var(--muted); fo
 const SUPABASE_URL = "https://zocxfefydgdpsnhhggga.supabase.co";
 const SUPABASE_KEY = "sb_publishable_6ElWA_2glJ3sBEAhVenYEA_dnbpxW_z"; // public key, safe in the page
 
+const APP_VERSION = "20261109233432"; // bump with version.json on every release
 const PEOPLE = ["Fraser", "Ewan", "Tom", "Jayden"];
 const PAIRS = [["Fraser", "Ewan"], ["Tom", "Jayden"]];
 const ANCHOR = new Date(2026, 10, 9); // Mon 9 Nov 2026 = Fraser & Ewan, Fraser on the kitchen half
@@ -954,9 +1010,12 @@ function say(msg, undo) {
 function setMe(name) { me = name; try { localStorage.setItem("rota-me", me); } catch (err) {} if (mySub && me) saveSub(mySub).catch(() => {}); renderAll(); }
 
 // ---- Screens ----
-const SCREENS = ["home", "rota", "calendar", "money", "house"];
+const SCREENS = ["home", "rota", "calendar", "money", "chat", "house"];
 function showScreen() {
-  const want = location.hash.slice(1), cur = SCREENS.includes(want) ? want : "home";
+  let want = location.hash.slice(1);
+  if (want.startsWith("chat-")) { const id = want.slice(5); want = "chat"; setTimeout(() => openChat(id), 0); }
+  else if (want === "chat") setTimeout(() => closeChat(), 0);
+  const cur = SCREENS.includes(want) ? want : "home";
   document.querySelectorAll(".screen").forEach(m => m.hidden = m.dataset.screen !== cur);
   document.querySelectorAll(".tabbar a").forEach(a => { if (a.dataset.tab === cur) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   window.scrollTo(0, 0);
@@ -1813,9 +1872,116 @@ async function nudge(kind, to) {
   else say(`${to} hasn't turned on notifications yet, so they won't see it. Tell them to tap the 🔔.`);
 }
 
-function renderAll() { rota = rotaFor(thisMonday); renderHeader(); renderMe(); renderHome(); renderOverdue(); renderPeople(); renderComments(); renderExtension(); renderAway(); renderSupplies(); renderHistory(); renderUpcoming(); renderCalendar(); renderInfo(); renderMoney(); renderStanding(); renderNotif(); renderProfile(); }
+// ---- Chat: Everard FC group + private chats ----
+const GROUP = "everard-fc";
+const dmId = (a, b) => "dm-" + [a, b].sort().join("-");
+const chatTitle = c => c === GROUP ? "Everard FC" : c.replace(/^dm-/, "").split("-").find(p => p !== me) || "Chat";
+const myChats = () => me ? [GROUP, ...PEOPLE.filter(p => p !== me).map(p => dmId(me, p))] : [GROUP];
+let chatRecent = {}, chatOpen = null, chatMsgs = [], chatTimer = null;
+const lastRead = c => { try { return localStorage.getItem("rota-read-" + c) || ""; } catch (e) { return ""; } };
+const markRead = (c, ts) => { try { localStorage.setItem("rota-read-" + c, ts); } catch (e) {} };
+const msgApi = (q, opts) => api("messages?" + q, opts);
+async function loadChatList() {
+  try {
+    const r = await msgApi("select=id,chat,sender,body,created_at&order=created_at.desc&limit=500"); if (!r.ok) return;
+    const rows = await r.json(); chatRecent = {};
+    for (const m of rows) (chatRecent[m.chat] ||= []).push(m);
+    renderChatList(); renderChatBadge();
+  } catch (e) {}
+}
+function unreadIn(c) { const lr = lastRead(c); return (chatRecent[c] || []).filter(m => m.sender !== me && m.created_at > lr).length; }
+function renderChatBadge() {
+  const n = myChats().reduce((a, c) => a + unreadIn(c), 0), b = $("chatBadge");
+  b.hidden = !n; b.textContent = n > 9 ? "9+" : String(n);
+  const hc = $("homeChat"); if (!hc) return; hc.innerHTML = "";
+  const g = el("div", "go"); g.append(el("p", "big", n ? `Chat · ${n} unread` : "Chat")); hc.append(g);
+  const last = myChats().map(c => (chatRecent[c] || [])[0]).filter(Boolean).sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
+  hc.append(el("p", "hint", last ? `${last.sender}${last.chat === GROUP ? " in Everard FC" : ""}: ${last.body.slice(0, 70)}` : "Say hello in Everard FC."));
+}
+const timeShort = iso => { const d = new Date(iso), today = keyOf(new Date()) === keyOf(d); return today ? d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : d.toLocaleDateString("en-GB", { day: "numeric", month: "short" }); };
+function renderChatList() {
+  const ul = $("chatList"); if (!ul) return; ul.textContent = "";
+  for (const c of myChats()) {
+    const li = el("li"), b = el("button", "chatrow"); b.type = "button";
+    const icon = c === GROUP ? el("span", "crest", "⚽") : avatar(chatTitle(c), 46);
+    const last = (chatRecent[c] || [])[0], n = unreadIn(c);
+    const mid = el("span", "mid"); mid.append(el("b", null, chatTitle(c)), el("small", null, last ? `${last.sender === me ? "You" : last.sender}: ${last.body}` : c === GROUP ? "The whole house" : "Private chat"));
+    const right = el("span", "right"); right.append(el("small", null, last ? timeShort(last.created_at) : "")); if (n) right.append(el("i", "badge inline", String(n)));
+    b.append(icon, mid, right); b.addEventListener("click", () => { location.hash = "chat-" + c; });
+    li.append(b); ul.append(li);
+  }
+}
+async function openChat(c) {
+  if (!me) { say("Pick who you are first."); location.hash = "home"; return; }
+  if (c !== GROUP && !c.split("-").includes(me)) { location.hash = "chat"; return; }
+  chatOpen = c; $("chatListView").hidden = true; $("chatView").hidden = false;
+  $("chatTitle").textContent = chatTitle(c);
+  const hav = $("chatHeadAv"); hav.textContent = ""; hav.append(c === GROUP ? el("span", "crest sm", "⚽") : avatar(chatTitle(c), 32));
+  chatMsgs = (chatRecent[c] || []).slice().reverse(); renderMsgs(true);
+  await pollChat(true);
+  clearInterval(chatTimer); chatTimer = setInterval(() => { if (document.visibilityState === "visible" && chatOpen) pollChat(false); }, 4000);
+  setTimeout(() => $("msgInput").focus(), 50);
+}
+function closeChat() { chatOpen = null; clearInterval(chatTimer); $("chatView").hidden = true; $("chatListView").hidden = false; renderChatList(); renderChatBadge(); }
+async function pollChat(scroll) {
+  const c = chatOpen; if (!c) return;
+  try {
+    const r = await msgApi(`select=id,chat,sender,body,created_at&chat=eq.${encodeURIComponent(c)}&order=created_at.desc&limit=200`); if (!r.ok) return;
+    const rows = (await r.json()).reverse();
+    if (c !== chatOpen) return;
+    const changed = rows.length !== chatMsgs.filter(m => !m.pending).length || (rows.at(-1)?.id !== chatMsgs.filter(m => !m.pending).at(-1)?.id);
+    chatMsgs = [...rows, ...chatMsgs.filter(m => m.pending && !rows.some(x => x.body === m.body && x.sender === m.sender))];
+    chatRecent[c] = rows.slice().reverse();
+    if (rows.length) markRead(c, rows.at(-1).created_at);
+    if (changed || scroll) renderMsgs(true);
+    renderChatBadge();
+  } catch (e) {}
+}
+function renderMsgs(scroll) {
+  const box = $("msgList"), atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+  box.textContent = "";
+  if (!chatMsgs.length) box.append(el("p", "hint center", chatOpen === GROUP ? "No messages yet. Kick things off in Everard FC." : `Start your private chat with ${chatTitle(chatOpen)}.`));
+  let lastDay = "", lastSender = "";
+  for (const m of chatMsgs) {
+    const day = keyOf(new Date(m.created_at));
+    if (day !== lastDay) { box.append(el("p", "dayline", day === keyOf(new Date()) ? "Today" : fmtDay(new Date(m.created_at)))); lastDay = day; lastSender = ""; }
+    const mine = m.sender === me, row = el("div", "msg" + (mine ? " mine" : "") + (m.pending ? " pending" : ""));
+    if (!mine) row.append(m.sender !== lastSender ? avatar(m.sender, 28) : el("span", "avsp"));
+    const bub = el("div", "bubble");
+    if (!mine && chatOpen === GROUP && m.sender !== lastSender) bub.append(el("small", "from", m.sender));
+    bub.append(el("span", "text", m.body), el("small", "time", m.pending ? "sending…" : new Date(m.created_at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })));
+    row.append(bub); box.append(row); lastSender = m.sender;
+  }
+  if (scroll || atBottom) requestAnimationFrame(() => { box.scrollTop = box.scrollHeight; window.scrollTo(0, document.body.scrollHeight); });
+}
+$("composer").addEventListener("submit", async e => {
+  e.preventDefault();
+  const body = $("msgInput").value.trim(); if (!body || !chatOpen || !me) return;
+  $("msgInput").value = "";
+  const tmp = { id: "tmp" + uid(), chat: chatOpen, sender: me, body, created_at: new Date().toISOString(), pending: true };
+  chatMsgs.push(tmp); renderMsgs(true);
+  try {
+    const r = await msgApi("select=id", { method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify({ chat: chatOpen, sender: me, body }) });
+    if (!r.ok) throw new Error(r.status);
+    const [row] = await r.json(); fozz({ mode: "message", id: row.id });
+    await pollChat(true);
+  } catch (err) { chatMsgs = chatMsgs.filter(m => m !== tmp); renderMsgs(true); $("msgInput").value = body; say("Message didn't send. Check your signal and try again."); }
+});
+$("chatBack").addEventListener("click", () => { location.hash = "chat"; });
 
+function renderAll() { rota = rotaFor(thisMonday); renderHeader(); renderMe(); renderHome(); renderOverdue(); renderPeople(); renderComments(); renderExtension(); renderAway(); renderSupplies(); renderHistory(); renderUpcoming(); renderCalendar(); renderInfo(); renderMoney(); renderStanding(); renderNotif(); renderProfile(); renderChatList(); renderChatBadge(); }
+
+// Phones must never run an old version (old code can misread new data). Reload as soon as a newer release is live.
+async function checkVersion() {
+  try {
+    const r = await fetch("version.json?t=" + Date.now(), { cache: "no-store" }); if (!r.ok) return;
+    const { v } = await r.json();
+    if (v && v !== APP_VERSION) location.replace(location.pathname + "?v=" + v + location.hash);
+  } catch (e) {}
+}
 async function refresh() {
+  checkVersion();
+  loadChatList();
   if (busy) return;
   try { await load(); connected = true; }
   catch (e) { if (!connected) say("Couldn't load. Check your signal."); }
@@ -1839,6 +2005,7 @@ refresh();
 setInterval(() => { if (document.visibilityState === "visible") refresh(); }, 20000);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refresh(); });
 setInterval(renderDeadline, 60000);
+setInterval(() => { if (document.visibilityState === "visible" && location.hash.startsWith("#chat") && !chatOpen) loadChatList(); }, 8000);
 </script>
 </body>
 </html>
