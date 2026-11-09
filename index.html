@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>House Rota</title>
+<title>The House</title>
 <meta name="theme-color" content="#0f7c86">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="House Rota">
+<meta name="apple-mobile-web-app-title" content="The House">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -125,91 +125,202 @@ section > h2.sec { font-size: 20px; font-weight: 600; }
 details { color: var(--muted); font-size: 14px; }
 details summary { cursor: pointer; font-weight: 700; color: var(--ink); }
 details p { margin: 8px 0 0; }
-@media (prefers-reduced-motion: reduce) { .bar > span { transition: none; } }
+/* ---- App shell: screens + bottom tab bar ---- */
+.wrap { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); display: block; }
+.screen { display: grid; gap: 22px; }
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: grid; grid-template-columns: repeat(5, 1fr);
+  background: var(--surface); border-top: 1px solid var(--line);
+  padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
+.tabbar a { position: relative; display: grid; justify-items: center; gap: 2px; padding: 6px 0; text-decoration: none; color: var(--muted); font-size: 11px; font-weight: 700; border-radius: 10px; }
+.tabbar a svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tabbar a[aria-current=page] { color: var(--accent); background: var(--accent-soft); }
+.tabbar a:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+.tabbar .dot { position: absolute; top: 4px; left: calc(50% + 8px); width: 9px; height: 9px; border-radius: 50%; background: var(--red); border: 2px solid var(--surface); }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(78px + env(safe-area-inset-bottom, 0px)); z-index: 30; margin: 0;
+  max-width: min(92vw, 440px); background: var(--ink); color: var(--bg); padding: 10px 14px; border-radius: 12px; font-size: 14px; font-weight: 700;
+  opacity: 0; pointer-events: none; transition: opacity .2s; }
+.toast.show { opacity: 1; }
+
+/* ---- Home dashboard ---- */
+.hello h1 { font-size: 32px; font-weight: 800; }
+.whogrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.whogrid .btn { min-height: 52px; font-size: 17px; }
+.card.tap { cursor: pointer; }
+.card.tap:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.card .go { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.card .go::after { content: "›"; font-size: 22px; color: var(--muted); line-height: 1; }
+.big { font-family: var(--display); font-size: 22px; font-weight: 600; margin: 0; }
+.alert { background: var(--red); color: var(--red-ink); border-radius: 14px; padding: 14px; display: grid; gap: 8px; cursor: pointer; }
+.alert b { font-family: var(--display); font-size: 19px; }
+.alert.soft { background: var(--glove); color: var(--glove-ink); }
+.mini { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.mini li { display: flex; gap: 10px; align-items: baseline; font-size: 15px; }
+.mini li .when { flex: none; width: 4.6em; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+
+/* ---- Calendar ---- */
+.dates { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dates label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); font-weight: 700; min-width: 0; }
+input[type=date] { width: 100%; min-width: 0; border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 8px 10px; min-height: 42px; font: inherit; color: inherit; }
+.agweek { display: grid; gap: 8px; padding: 12px 0; border-top: 1px solid var(--line); }
+.agweek h3 { margin: 0; font-size: 15px; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.agweek h3 span { color: var(--muted); font-weight: 400; font-size: 13px; }
+.ev { display: flex; gap: 10px; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--evc, var(--accent)); border-radius: 10px; padding: 10px 12px; }
+.ev .what { flex: 1; min-width: 0; }
+.ev .what b { display: block; }
+.ev .what small { color: var(--muted); font-size: 13px; }
+.ev[data-type=away] { --evc: var(--away); }
+.ev[data-type=bill] { --evc: var(--red); }
+.ev[data-type=guest] { --evc: var(--glove); }
+.ev[data-type=inspection] { --evc: var(--warn); }
+.ev[data-type=social] { --evc: var(--done); }
+.agweek .none { color: var(--muted); font-size: 14px; }
+
+/* ---- House info ---- */
+.info { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; }
+.info dt { color: var(--muted); font-size: 14px; }
+.info dd { margin: 0; font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+.info input { width: 100%; }
+@media (prefers-reduced-motion: reduce) { .bar > span, .toast { transition: none; } }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="me">
-    <span id="meText">Who's using this phone?</span>
-    <select id="meSelect" aria-label="Who are you?">
-      <option value="">Choose…</option>
-      <option>Fraser</option><option>Ewan</option><option>Tom</option><option>Jayden</option>
-    </select>
-  </div>
+  <main class="screen" data-screen="home">
+    <header class="hello">
+      <span class="eyebrow" id="todayLabel">Today</span>
+      <h1 id="helloName">Hi there</h1>
+    </header>
+    <section class="card" id="homeWho" hidden>
+      <div class="sechead"><h2 class="sec">Who are you?</h2><p>Pick your name once. This phone remembers it.</p></div>
+      <div class="whogrid" id="whoButtons"></div>
+    </section>
+    <section id="homeAlert" hidden></section>
+    <section class="card" id="homeJobs"></section>
+    <section class="card tap" id="homeHouse" data-go="rota"></section>
+    <section class="card tap" id="homeCal" data-go="calendar"></section>
+    <section class="card tap" id="homeMoney" data-go="money"></section>
+    <section class="card tap" id="homeLow" data-go="house"></section>
+  </main>
 
-  <section id="overdue" hidden></section>
+  <main class="screen" data-screen="rota" hidden>
+    <section id="overdue" hidden></section>
+    <header>
+      <span class="eyebrow" id="weekLabel">This week</span>
+      <h1>On cleaning: <span class="pair" id="pairName">…</span></h1>
+      <span class="deadline" id="deadline">Due Sunday night</span>
+    </header>
+    <section class="progress" aria-label="Progress this week">
+      <div class="bar"><span id="barFill"></span></div>
+      <small id="progressText">0 of 5 rooms done</small>
+    </section>
+    <section class="people" id="people"></section>
+    <section class="card">
+      <div class="sechead"><h2 class="sec">Comments</h2><p>Notes for this week, e.g. "bins still need doing" or "great job on the kitchen".</p></div>
+      <ul class="list" id="comments"></ul>
+      <select id="commentRoom" aria-label="About which room">
+        <option value="">General</option>
+        <option value="kitchen">Kitchen</option><option value="hallway">Hallway</option>
+        <option value="living">Living room</option><option value="toilet">Toilet</option><option value="shower">Shower room</option>
+      </select>
+      <div class="row">
+        <input type="text" id="commentInput" maxlength="200" placeholder="Write a comment…">
+        <button class="btn primary" id="commentBtn" type="button">Post</button>
+      </div>
+    </section>
+    <section class="card" id="extCard">
+      <div class="sechead"><h2 class="sec">Need more time?</h2><p id="extIntro">Ask for an extension on your rooms this week.</p></div>
+      <div id="extBody"></div>
+    </section>
+    <section>
+      <div class="sechead"><h2 class="sec">Previous weeks</h2></div>
+      <ul class="weeks" id="history"></ul>
+    </section>
+    <section>
+      <div class="sechead"><h2 class="sec">Coming up</h2></div>
+      <ul class="weeks" id="upcoming"></ul>
+    </section>
+    <details>
+      <summary>How the rota works</summary>
+      <p>It flips every Monday. Fraser &amp; Ewan take one week, Tom &amp; Jayden the next. Each pair splits the five rooms: one person does the kitchen and hallway, the other does the living room, toilet and shower room. Next time your pair is up, you swap halves.</p>
+      <p>Everything is due by Sunday 23:59. You can ask for up to 3 extra days. If you're away on your week, sort a swap with someone and mark it here so everyone knows.</p>
+      <p>Keep it on your phone: iPhone, Share → Add to Home Screen. Android, ⋮ → Add to Home screen.</p>
+    </details>
+  </main>
 
-  <header>
-    <span class="eyebrow" id="weekLabel">This week</span>
-    <h1>On cleaning: <span class="pair" id="pairName">…</span></h1>
-    <span class="deadline" id="deadline">Due Sunday night</span>
-  </header>
+  <main class="screen" data-screen="calendar" hidden>
+    <header><span class="eyebrow">House calendar</span><h1>What's on</h1></header>
+    <section class="card">
+      <div class="sechead"><h2 class="sec">Add to the calendar</h2><p>Guests, bills due, inspections, nights out, anything the house should know.</p></div>
+      <input type="text" id="evTitle" maxlength="60" placeholder="e.g. Ewan's parents staying">
+      <div class="seg" id="evTypes" role="group" aria-label="Type"></div>
+      <div class="dates">
+        <label>From<input type="date" id="evStart"></label>
+        <label>To (optional)<input type="date" id="evEnd"></label>
+      </div>
+      <input type="text" id="evNote" maxlength="100" placeholder="Note (optional), e.g. £85, due to Octopus">
+      <button class="btn primary" id="evAdd" type="button">Add to calendar</button>
+    </section>
+    <section class="card">
+      <div class="sechead"><h2 class="sec">Going away?</h2><p>Let everyone know which week you're not around.</p></div>
+      <div class="seg" id="awayWeeks" role="group" aria-label="Which week"></div>
+      <div class="row">
+        <input type="text" id="awayNote" maxlength="80" placeholder="Optional note, e.g. home Thu night">
+        <button class="btn primary" id="awayBtn" type="button">I'm away</button>
+      </div>
+      <p class="hint" id="awayHint"></p>
+    </section>
+    <section>
+      <div class="sechead"><h2 class="sec">Next 8 weeks</h2></div>
+      <div id="agenda"></div>
+    </section>
+  </main>
 
-  <section class="progress" aria-label="Progress this week">
-    <div class="bar"><span id="barFill"></span></div>
-    <small id="progressText">0 of 5 rooms done</small>
-  </section>
+  <main class="screen" data-screen="money" hidden>
+    <header><span class="eyebrow">Splitwise</span><h1>Money</h1></header>
+    <section class="card" id="moneyBody">
+      <div class="sechead"><h2 class="sec">Not connected yet</h2><p>Balances, recent expenses and "add an expense with a receipt" will show here once Splitwise is connected.</p></div>
+    </section>
+  </main>
 
-  <section class="people" id="people"></section>
-  <p class="status" id="status" role="status"></p>
-
-  <section class="card">
-    <div class="sechead"><h2 class="sec">Comments</h2><p>Notes for this week, e.g. "bins still need doing" or "great job on the kitchen".</p></div>
-    <ul class="list" id="comments"></ul>
-    <select id="commentRoom" aria-label="About which room">
-      <option value="">General</option>
-      <option value="kitchen">Kitchen</option><option value="hallway">Hallway</option>
-      <option value="living">Living room</option><option value="toilet">Toilet</option><option value="shower">Shower room</option>
-    </select>
-    <div class="row">
-      <input type="text" id="commentInput" maxlength="200" placeholder="Write a comment…">
-      <button class="btn primary" id="commentBtn" type="button">Post</button>
+  <main class="screen" data-screen="house" hidden>
+    <header><span class="eyebrow">The house</span><h1>House</h1></header>
+    <section class="card">
+      <div class="sechead"><h2 class="sec">Running low</h2><p>Tap what we need. Tick it off when you've bought it.</p></div>
+      <div class="chips" id="quickAdd"></div>
+      <div class="row">
+        <input type="text" id="supplyInput" maxlength="40" placeholder="Something else…">
+        <button class="btn" id="supplyBtn" type="button">Add</button>
+      </div>
+      <ul class="list" id="supplies"></ul>
+    </section>
+    <section class="card">
+      <div class="sechead"><h2 class="sec">House info</h2><p>The stuff everyone asks about. Anyone can edit.</p></div>
+      <dl class="info" id="infoList"></dl>
+      <button class="btn" id="infoEdit" type="button">Edit</button>
+    </section>
+    <section class="card">
+      <div class="sechead"><h2 class="sec">This phone</h2></div>
+    <div class="me">
+      <span id="meText">Who's using this phone?</span>
+      <select id="meSelect" aria-label="Who are you?">
+        <option value="">Choose…</option>
+        <option>Fraser</option><option>Ewan</option><option>Tom</option><option>Jayden</option>
+      </select>
     </div>
-  </section>
-
-  <section class="card" id="extCard">
-    <div class="sechead"><h2 class="sec">Need more time?</h2><p id="extIntro">Ask for an extension on your rooms this week.</p></div>
-    <div id="extBody"></div>
-  </section>
-
-  <section class="card">
-    <div class="sechead"><h2 class="sec">Going away?</h2><p>Let everyone know which week you're not around.</p></div>
-    <div class="seg" id="awayWeeks" role="group" aria-label="Which week"></div>
-    <div class="row">
-      <input type="text" id="awayNote" maxlength="80" placeholder="Optional note, e.g. home Thu night">
-      <button class="btn primary" id="awayBtn" type="button">I'm away</button>
-    </div>
-    <p class="hint" id="awayHint"></p>
-  </section>
-
-  <section class="card">
-    <div class="sechead"><h2 class="sec">Running low</h2><p>Tap what we need. Tick it off when you've bought it.</p></div>
-    <div class="chips" id="quickAdd"></div>
-    <div class="row">
-      <input type="text" id="supplyInput" maxlength="40" placeholder="Something else…">
-      <button class="btn" id="supplyBtn" type="button">Add</button>
-    </div>
-    <ul class="list" id="supplies"></ul>
-  </section>
-
-  <section>
-    <div class="sechead"><h2 class="sec">Previous weeks</h2></div>
-    <ul class="weeks" id="history"></ul>
-  </section>
-
-  <section>
-    <div class="sechead"><h2 class="sec">Coming up</h2></div>
-    <ul class="weeks" id="upcoming"></ul>
-  </section>
-
-  <details>
-    <summary>How the rota works</summary>
-    <p>It flips every Monday. Fraser &amp; Ewan take one week, Tom &amp; Jayden the next. Each pair splits the five rooms: one person does the kitchen and hallway, the other does the living room, toilet and shower room. Next time your pair is up, you swap halves.</p>
-    <p>Everything is due by Sunday 23:59. You can ask for up to 3 extra days. If you're away on your week, sort a swap with someone and mark it here so everyone knows.</p>
-    <p>Keep it on your phone: iPhone, Share → Add to Home Screen. Android, ⋮ → Add to Home screen.</p>
-  </details>
+      <p class="hint" id="notifHint">Notifications from the Fozzfather are coming soon.</p>
+    </section>
+  </main>
 </div>
+
+<p class="toast" id="status" role="status" aria-live="polite"></p>
+
+<nav class="tabbar" aria-label="Screens">
+  <a href="#home" data-tab="home"><svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9h-6v-6H9v6H3z"/></svg><span>Home</span></a>
+  <a href="#rota" data-tab="rota"><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg><span>Rota</span><i class="dot" id="rotaDot" hidden></i></a>
+  <a href="#calendar" data-tab="calendar"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Calendar</span></a>
+  <a href="#money" data-tab="money"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg><span>Money</span></a>
+  <a href="#house" data-tab="house"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg><span>House</span></a>
+</nav>
 
 <script>
 // ---- Storage config: Supabase project (filled in once created) ----
@@ -277,7 +388,7 @@ async function save(key, data) {
 // Fetch latest, apply a change to one key, save. Keeps other people's edits.
 let busy = false;
 async function change(key, fn, okMsg) {
-  if (!connected) { $("status").textContent = "Saving isn't connected yet."; return; }
+  if (!connected) { say("Saving isn't connected yet."); return; }
   if (busy) return;
   busy = true;
   try {
@@ -285,9 +396,9 @@ async function change(key, fn, okMsg) {
     const next = fn(structuredClone(store[key] || {}));
     store[key] = next; renderAll();
     await save(key, next);
-    $("status").textContent = okMsg || "Saved. Everyone can see it.";
+    say(okMsg || "Saved. Everyone can see it.");
   } catch (e) {
-    $("status").textContent = "Couldn't save that. Check your signal and try again.";
+    say("Couldn't save that. Check your signal and try again.");
   } finally { busy = false; }
 }
 
@@ -542,29 +653,214 @@ function postComment() {
   change("week:" + thisKey, x => ({ ...x, comments: [...(x.comments || []), { id: uid(), by: me, at: Date.now(), room, text }] }), "Comment posted. Everyone can see it.");
   $("commentInput").value = "";
 }
-function renderAll() { renderMe(); renderOverdue(); renderPeople(); renderComments(); renderExtension(); renderAway(); renderSupplies(); renderHistory(); renderUpcoming(); }
+// ---- Toast messages ----
+let toastTimer;
+function say(msg) { const t = $("status"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2600); }
+
+// ---- Who am I ----
+function setMe(name) { me = name; try { localStorage.setItem("rota-me", me); } catch (err) {} renderAll(); }
+
+// ---- Screens ----
+const SCREENS = ["home", "rota", "calendar", "money", "house"];
+function showScreen() {
+  const want = location.hash.slice(1), cur = SCREENS.includes(want) ? want : "home";
+  document.querySelectorAll(".screen").forEach(m => m.hidden = m.dataset.screen !== cur);
+  document.querySelectorAll(".tabbar a").forEach(a => { if (a.dataset.tab === cur) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", showScreen);
+document.querySelectorAll("[data-go]").forEach(c => {
+  c.tabIndex = 0;
+  c.addEventListener("click", e => { if (!e.target.closest("button, a, input")) location.hash = c.dataset.go; });
+  c.addEventListener("keydown", e => { if (e.key === "Enter" && e.target === c) location.hash = c.dataset.go; });
+});
+
+// ---- Calendar ----
+const EV_TYPES = [["guest", "Guest"], ["bill", "Bill due"], ["social", "Social"], ["inspection", "Inspection"], ["away", "Away"], ["other", "Other"]];
+let evType = "guest";
+const todayKey = () => keyOf(new Date());
+const parseDay = k => { const [y, m, d] = k.split("-").map(Number); return new Date(y, m - 1, d); };
+function allEvents() {
+  const evs = [...(store.calendar?.events || [])].map(e => ({ ...e, src: "cal" }));
+  // Away weeks marked on the rota show up here too
+  for (const [k, v] of Object.entries(store)) if (k.startsWith("week:")) for (const [name, a] of Object.entries(v.away || {})) {
+    const m = parseDay(k.slice(5));
+    evs.push({ id: "away-" + k + name, src: "away", type: "away", title: `${name} away`, note: a.note || "", start: keyOf(m), end: keyOf(addDays(m, 6)), by: name });
+  }
+  return evs.sort((a, b) => a.start.localeCompare(b.start));
+}
+const overlaps = (e, from, to) => e.start <= to && (e.end || e.start) >= from;
+function evWhen(e) {
+  const s = parseDay(e.start);
+  if (!e.end || e.end === e.start) return fmtDay(s);
+  return `${fmtDay(s)} – ${fmtDay(parseDay(e.end))}`;
+}
+function evNode(e) {
+  const d = el("div", "ev"); d.dataset.type = e.type;
+  const what = el("div", "what");
+  what.append(el("b", null, e.title), el("small", null, [evWhen(e), e.note, e.by && e.src === "cal" ? `added by ${e.by}` : ""].filter(Boolean).join(" · ")));
+  d.append(what);
+  if (e.src === "cal") {
+    const b = el("button", "btn small", "Remove"); b.type = "button";
+    b.addEventListener("click", () => change("calendar", x => ({ events: (x.events || []).filter(y => y.id !== e.id) }), "Removed from the calendar."));
+    d.append(b);
+  }
+  return d;
+}
+function renderCalendar() {
+  const seg = $("evTypes"); seg.textContent = "";
+  for (const [id, label] of EV_TYPES) {
+    const b = el("button", "btn small", label); b.type = "button"; b.setAttribute("aria-pressed", String(evType === id));
+    b.addEventListener("click", () => { evType = id; renderCalendar(); });
+    seg.append(b);
+  }
+  if (!$("evStart").value) $("evStart").value = todayKey();
+  const box = $("agenda"); box.textContent = "";
+  const evs = allEvents();
+  for (let i = 0; i < 8; i++) {
+    const m = addWeeks(thisMonday, i), from = keyOf(m), to = keyOf(addDays(m, 6));
+    const wkEl = el("div", "agweek");
+    const h = el("h3"); h.append(document.createTextNode(i === 0 ? "This week" : `w/c ${fmt(m)}`), el("span", null, `Cleaning: ${rotaFor(m).pair.join(" & ")}`));
+    wkEl.append(h);
+    const these = evs.filter(e => overlaps(e, i === 0 ? todayKey() : from, to));
+    if (!these.length) wkEl.append(el("p", "none", "Nothing on."));
+    these.forEach(e => wkEl.append(evNode(e)));
+    box.append(wkEl);
+  }
+}
+function addEvent() {
+  const title = $("evTitle").value.trim(), start = $("evStart").value, end = $("evEnd").value;
+  if (!title) { say("Give it a title first."); $("evTitle").focus(); return; }
+  if (!start) { say("Pick a date."); return; }
+  if (end && end < start) { say("The end date is before the start date."); return; }
+  const ev = { id: uid(), title, type: evType, start, end: end || null, note: $("evNote").value.trim(), by: me || null, at: Date.now() };
+  change("calendar", x => ({ events: [...(x.events || []).filter(y => (y.end || y.start) >= keyOf(addWeeks(thisMonday, -8))), ev] }), "Added to the calendar.");
+  $("evTitle").value = ""; $("evNote").value = ""; $("evEnd").value = "";
+}
+
+// ---- House info ----
+const INFO_FIELDS = [["wifi", "Wi-Fi name"], ["wifipw", "Wi-Fi password"], ["landlord", "Landlord / agent"], ["bins", "Bin day"], ["rent", "Rent due"], ["notes", "Other"]];
+let infoEditing = false;
+function renderInfo() {
+  const dl = $("infoList"), info = store.info?.fields || {};
+  dl.textContent = "";
+  for (const [id, label] of INFO_FIELDS) {
+    dl.append(el("dt", null, label));
+    const dd = el("dd");
+    if (infoEditing) { const inp = el("input"); inp.type = "text"; inp.id = "info-" + id; inp.maxLength = 120; inp.value = info[id] || ""; dd.append(inp); }
+    else dd.textContent = info[id] || "–";
+    dl.append(dd);
+  }
+  $("infoEdit").textContent = infoEditing ? "Save" : "Edit";
+  $("infoEdit").classList.toggle("primary", infoEditing);
+}
+$("infoEdit").addEventListener("click", () => {
+  if (!infoEditing) { infoEditing = true; renderInfo(); return; }
+  const fields = Object.fromEntries(INFO_FIELDS.map(([id]) => [id, $("info-" + id).value.trim()]));
+  infoEditing = false;
+  change("info", x => ({ fields }), "House info saved.");
+});
+
+// ---- Home dashboard ----
+function toggleRoom(weekKey, roomId) {
+  change("week:" + weekKey, x => {
+    const t = { ...(x.ticks || {}) };
+    if (t[roomId]) delete t[roomId]; else t[roomId] = { by: me || null, at: Date.now() };
+    return { ...x, ticks: t };
+  });
+}
+function roomButton(r, ticked, onClick) {
+  const b = el("button", "room" + (ticked ? " is-done" : "")); b.type = "button"; b.disabled = !connected;
+  b.setAttribute("aria-pressed", ticked ? "true" : "false");
+  b.innerHTML = `<span class="tick">${TICK}</span><span><span class="rname"></span><span class="rhint"></span></span>`;
+  b.querySelector(".rname").textContent = r.name;
+  b.querySelector(".rhint").textContent = r.hint;
+  b.addEventListener("click", onClick);
+  return b;
+}
+function renderHome() {
+  const now = new Date(), hr = now.getHours();
+  $("todayLabel").textContent = now.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+  $("helloName").textContent = me ? `${hr < 12 ? "Morning" : hr < 18 ? "Afternoon" : "Evening"}, ${me}` : "Welcome home";
+  $("homeWho").hidden = !!me;
+  const wb = $("whoButtons"); if (!wb.children.length) PEOPLE.forEach(n => { const b = el("button", "btn", n); b.type = "button"; b.addEventListener("click", () => setMe(n)); wb.append(b); });
+
+  // Overdue alert
+  const od = outstanding(), alertBox = $("homeAlert");
+  const mineOd = od.filter(i => i.person === me);
+  alertBox.textContent = ""; alertBox.hidden = !od.length;
+  $("rotaDot").hidden = !od.some(i => i.late);
+  if (od.length) {
+    const late = od.some(i => i.late), a = el("div", "alert" + (late ? "" : " soft"));
+    a.append(el("b", null, mineOd.length ? `You've got ${mineOd.length} room${mineOd.length > 1 ? "s" : ""} ${late ? "overdue" : "still to do"}` : `${od.length} room${od.length > 1 ? "s" : ""} overdue in the house`));
+    a.append(el("span", null, (mineOd.length ? mineOd : od).map(i => `${mineOd.length ? "" : i.person + ": "}${i.room.name}`).join(", ") + " · tap to sort it"));
+    a.addEventListener("click", () => location.hash = "rota");
+    alertBox.append(a);
+  }
+
+  // My jobs
+  const jobs = $("homeJobs"); jobs.textContent = "";
+  if (!me) { jobs.hidden = true; } else {
+    jobs.hidden = false;
+    const mine = rota.people.find(([p]) => p === me);
+    if (mine) {
+      const d = ticksFor(thisKey), left = mine[1].filter(r => !d[r.id]).length;
+      jobs.append(el("div", "sechead"), el("p", "big", left ? `Your jobs this week · ${left} left` : "Your jobs are done this week"));
+      jobs.firstChild.remove();
+      const ul = el("ul", "rooms");
+      mine[1].forEach(r => { const li = el("li"); li.append(roomButton(r, !!d[r.id], () => toggleRoom(thisKey, r.id))); ul.append(li); });
+      jobs.append(ul, el("p", "hint", `Due ${fmtDay(personEnd(thisMonday, me))} 23:59`));
+    } else {
+      const m = nextTurn(me), r = rotaFor(m).people.find(([p]) => p === me);
+      jobs.append(el("p", "big", "You're off cleaning this week"), el("p", "hint", `Next up w/c ${fmt(m)}: ${r[1].map(x => x.name).join(", ")}.`));
+    }
+  }
+
+  // House this week
+  const hh = $("homeHouse"), d = ticksFor(thisKey), n = ALL_ROOMS.filter(r => d[r.id]).length;
+  hh.innerHTML = "";
+  const g1 = el("div", "go"); g1.append(el("p", "big", `Rota: ${rota.pair.join(" & ")}`)); hh.append(g1);
+  const bar = el("div", "bar"), fill = el("span"); fill.style.width = (n / 5 * 100) + "%"; bar.append(fill);
+  hh.append(bar, el("p", "hint", `${n} of 5 rooms done · due Sun 23:59`));
+
+  // Calendar
+  const hc = $("homeCal"); hc.innerHTML = "";
+  const g2 = el("div", "go"); g2.append(el("p", "big", "Coming up")); hc.append(g2);
+  const soon = allEvents().filter(e => overlaps(e, todayKey(), keyOf(addDays(new Date(), 14)))).slice(0, 4);
+  if (!soon.length) hc.append(el("p", "hint", "Nothing in the next two weeks. Add guests, bills or plans in Calendar."));
+  else { const ul = el("ul", "mini"); soon.forEach(e => { const li = el("li"); li.append(el("span", "when", fmt(parseDay(e.start))), el("span", null, e.title)); ul.append(li); }); hc.append(ul); }
+
+  // Money (Splitwise comes in stage 2)
+  const hm = $("homeMoney"); hm.innerHTML = "";
+  const g3 = el("div", "go"); g3.append(el("p", "big", "Money")); hm.append(g3, el("p", "hint", "Splitwise isn't connected yet."));
+
+  // Running low
+  const hl = $("homeLow"), needed = (store.supplies?.items || []).filter(i => !i.got);
+  hl.innerHTML = "";
+  const g4 = el("div", "go"); g4.append(el("p", "big", needed.length ? `Running low · ${needed.length}` : "Running low")); hl.append(g4);
+  hl.append(el("p", "hint", needed.length ? needed.map(i => i.name).join(", ") : "Nothing needed right now."));
+}
+
+function renderAll() { renderMe(); renderHome(); renderOverdue(); renderPeople(); renderComments(); renderExtension(); renderAway(); renderSupplies(); renderHistory(); renderUpcoming(); renderCalendar(); renderInfo(); }
 
 async function refresh() {
   if (busy) return;
-  try { await load(); connected = true; $("status").textContent = "Tap a room when it's done."; }
-  catch (e) { $("status").textContent = connected ? "Couldn't refresh. Showing what we had." : "Couldn't load. Check your signal."; }
-  if (!busy && !document.activeElement?.matches("input")) renderAll();
+  try { await load(); connected = true; }
+  catch (e) { if (!connected) say("Couldn't load. Check your signal."); }
+  if (!busy && !document.activeElement?.matches("input, select")) renderAll();
 }
 
-$("meSelect").addEventListener("change", e => { me = e.target.value; try { localStorage.setItem("rota-me", me); } catch (err) {} renderAll(); });
+$("meSelect").addEventListener("change", e => setMe(e.target.value));
 $("commentBtn").addEventListener("click", postComment);
 $("commentInput").addEventListener("keydown", e => { if (e.key === "Enter") postComment(); });
 $("supplyBtn").addEventListener("click", () => addSupply($("supplyInput").value));
 $("supplyInput").addEventListener("keydown", e => { if (e.key === "Enter") addSupply(e.target.value); });
+$("evAdd").addEventListener("click", addEvent);
 
-renderHeader(); renderAll();
-if (SUPABASE_URL && SUPABASE_KEY) {
-  refresh();
-  setInterval(() => { if (document.visibilityState === "visible") refresh(); }, 20000);
-  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refresh(); });
-} else {
-  $("status").textContent = "Saving isn't connected yet. The rota itself is correct.";
-}
+renderHeader(); renderAll(); showScreen();
+refresh();
+setInterval(() => { if (document.visibilityState === "visible") refresh(); }, 20000);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refresh(); });
 setInterval(renderDeadline, 60000);
 </script>
 </body>
