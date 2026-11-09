@@ -175,6 +175,13 @@ input[type=date] { width: 100%; min-width: 0; border: 1px solid var(--line); bac
 .ev[data-type=social] { --evc: var(--done); }
 .agweek .none { color: var(--muted); font-size: 14px; }
 
+/* ---- Money + notifications ---- */
+.bigbtn { display: flex; align-items: center; justify-content: center; text-decoration: none; min-height: 54px; font-size: 17px; border-radius: 14px; }
+.bigbtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.notif { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.notif > div { min-width: 0; }
+.notif p { margin: 2px 0 0; }
+
 /* ---- House info ---- */
 .info { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; }
 .info dt { color: var(--muted); font-size: 14px; }
@@ -195,6 +202,12 @@ input[type=date] { width: 100%; min-width: 0; border: 1px solid var(--line); bac
       <div class="whogrid" id="whoButtons"></div>
     </section>
     <section id="homeAlert" hidden></section>
+    <section class="card" id="homeNotif" hidden>
+      <div class="notif">
+        <div><b>Hear from the Fozzfather</b><p class="hint">Reminders for your cleaning, bills due and what's on.</p></div>
+        <button class="btn primary" id="homeNotifBtn" type="button">Turn on</button>
+      </div>
+    </section>
     <section class="card" id="homeJobs"></section>
     <section class="card tap" id="homeHouse" data-go="rota"></section>
     <section class="card tap" id="homeCal" data-go="calendar"></section>
@@ -276,9 +289,21 @@ input[type=date] { width: 100%; min-width: 0; border: 1px solid var(--line); bac
   </main>
 
   <main class="screen" data-screen="money" hidden>
-    <header><span class="eyebrow">Splitwise</span><h1>Money</h1></header>
-    <section class="card" id="moneyBody">
-      <div class="sechead"><h2 class="sec">Not connected yet</h2><p>Balances, recent expenses and "add an expense with a receipt" will show here once Splitwise is connected.</p></div>
+    <header><span class="eyebrow">Bills &amp; Splitwise</span><h1>Money</h1></header>
+    <a class="btn primary bigbtn" href="https://secure.splitwise.com/#/groups/102632907" target="_blank" rel="noopener">Open Everard on Splitwise ↗</a>
+    <p class="hint">Balances and expenses stay in Splitwise. Log bills due here and the Fozzfather reminds everyone the day before.</p>
+    <section class="card">
+      <div class="sechead"><h2 class="sec">Bills due</h2></div>
+      <ul class="list" id="billsList"></ul>
+    </section>
+    <section class="card">
+      <div class="sechead"><h2 class="sec">Add a bill due</h2></div>
+      <input type="text" id="billTitle" maxlength="60" placeholder="e.g. Energy bill">
+      <div class="dates">
+        <label>Due<input type="date" id="billDate"></label>
+        <label>Amount (optional)<input type="text" id="billAmount" maxlength="20" placeholder="£85"></label>
+      </div>
+      <button class="btn primary" id="billAdd" type="button">Add bill</button>
     </section>
   </main>
 
@@ -307,7 +332,10 @@ input[type=date] { width: 100%; min-width: 0; border: 1px solid var(--line); bac
         <option>Fraser</option><option>Ewan</option><option>Tom</option><option>Jayden</option>
       </select>
     </div>
-      <p class="hint" id="notifHint">Notifications from the Fozzfather are coming soon.</p>
+      <div class="notif">
+        <div><b>Notifications</b><p class="hint" id="notifHint">Get reminders from the Fozzfather.</p></div>
+        <button class="btn primary" id="notifBtn" type="button">Turn on</button>
+      </div>
     </section>
   </main>
 </div>
@@ -658,7 +686,7 @@ let toastTimer;
 function say(msg) { const t = $("status"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2600); }
 
 // ---- Who am I ----
-function setMe(name) { me = name; try { localStorage.setItem("rota-me", me); } catch (err) {} renderAll(); }
+function setMe(name) { me = name; try { localStorage.setItem("rota-me", me); } catch (err) {} if (mySub && me) saveSub(mySub).catch(() => {}); renderAll(); }
 
 // ---- Screens ----
 const SCREENS = ["home", "rota", "calendar", "money", "house"];
@@ -832,7 +860,9 @@ function renderHome() {
 
   // Money (Splitwise comes in stage 2)
   const hm = $("homeMoney"); hm.innerHTML = "";
-  const g3 = el("div", "go"); g3.append(el("p", "big", "Money")); hm.append(g3, el("p", "hint", "Splitwise isn't connected yet."));
+  const g3 = el("div", "go"); g3.append(el("p", "big", "Money")); hm.append(g3);
+  const nextBill = upcomingBills()[0];
+  hm.append(el("p", "hint", nextBill ? `Next bill: ${nextBill.title} · ${fmtDay(parseDay(nextBill.start))}${nextBill.note ? " · " + nextBill.note : ""}` : "No bills logged. Balances are in Splitwise."));
 
   // Running low
   const hl = $("homeLow"), needed = (store.supplies?.items || []).filter(i => !i.got);
@@ -841,7 +871,80 @@ function renderHome() {
   hl.append(el("p", "hint", needed.length ? needed.map(i => i.name).join(", ") : "Nothing needed right now."));
 }
 
-function renderAll() { renderMe(); renderHome(); renderOverdue(); renderPeople(); renderComments(); renderExtension(); renderAway(); renderSupplies(); renderHistory(); renderUpcoming(); renderCalendar(); renderInfo(); }
+
+// ---- Money ----
+const upcomingBills = () => (store.calendar?.events || []).filter(e => e.type === "bill" && e.start >= todayKey()).sort((a, b) => a.start.localeCompare(b.start));
+function renderMoney() {
+  const ul = $("billsList"), bills = upcomingBills();
+  ul.textContent = "";
+  if (!bills.length) ul.append(el("li", "empty", "No bills due. Add one below."));
+  for (const e of bills) {
+    const li = el("li"), what = el("div", "what");
+    const days = Math.round((parseDay(e.start) - parseDay(todayKey())) / DAY);
+    what.append(el("b", null, e.title + (e.note ? ` · ${e.note}` : "")), el("small", null, `${fmtDay(parseDay(e.start))} · ${days === 0 ? "today" : days === 1 ? "tomorrow" : `in ${days} days`}`));
+    const b = el("button", "btn small", "Paid"); b.type = "button";
+    b.addEventListener("click", () => change("calendar", x => ({ events: (x.events || []).filter(y => y.id !== e.id) }), "Marked as paid."));
+    li.append(what, b); ul.append(li);
+  }
+  if (!$("billDate").value) $("billDate").value = todayKey();
+}
+$("billAdd").addEventListener("click", () => {
+  const title = $("billTitle").value.trim(), start = $("billDate").value, amount = $("billAmount").value.trim();
+  if (!title) { say("Give the bill a name first."); return; }
+  if (!start) { say("Pick the due date."); return; }
+  const ev = { id: uid(), title, type: "bill", start, end: null, note: amount, by: me || null, at: Date.now() };
+  change("calendar", x => ({ events: [...(x.events || []), ev] }), "Bill added. The Fozzfather will remind everyone.");
+  $("billTitle").value = ""; $("billAmount").value = "";
+});
+
+// ---- Notifications (the Fozzfather) ----
+const VAPID_PUBLIC = "BIiFwsbUQIrzQ6kbyEJxu8GK9YV5yjq4aPAih4dyyzCxTp24pDo39Xi6xENh-7urZu0xdr3k5FQVkVurfSOBZJ8";
+const FOZZ_URL = SUPABASE_URL + "/functions/v1/fozzfather";
+const ANON_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpvY3hmZWZ5ZGdkcHNuaGhnZ2dhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQyMzg2MTUsImV4cCI6MjEwOTgxNDYxNX0.DirBJZFrRK-IefVvelk3pUrcKORrqu7JpFWNPV0qnxY"; // public anon key, needed to call the function
+const pushSupported = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+let swReg = null, mySub = null;
+const b64ToBytes = b64 => { const s = atob((b64 + "=".repeat((4 - b64.length % 4) % 4)).replace(/-/g, "+").replace(/_/g, "/")); return Uint8Array.from(s, c => c.charCodeAt(0)); };
+async function saveSub(sub) {
+  const r = await api("push_subs?on_conflict=endpoint", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify({ endpoint: sub.endpoint, person: me || null, sub: sub.toJSON(), ua: navigator.userAgent.slice(0, 120) }) });
+  if (!r.ok) throw new Error(r.status);
+}
+async function turnOnNotifications() {
+  if (!me) { say("Pick who you are first."); location.hash = "home"; return; }
+  if (!pushSupported) { say(isIOS && !standalone ? "Add the app to your Home Screen first, then open it from the icon." : "This browser can't do notifications."); return; }
+  try {
+    const perm = await Notification.requestPermission();
+    if (perm !== "granted") { say("Notifications are blocked. Allow them in your phone's settings for this app."); renderNotif(); return; }
+    swReg = swReg || await navigator.serviceWorker.ready;
+    mySub = await swReg.pushManager.getSubscription() || await swReg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(VAPID_PUBLIC) });
+    await saveSub(mySub);
+    fetch(FOZZ_URL, { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + ANON_JWT }, body: JSON.stringify({ mode: "welcome", endpoint: mySub.endpoint }) }).catch(() => {});
+    say("Notifications on. The Fozzfather will be in touch.");
+  } catch (e) { say("Couldn't turn on notifications. Try again in a minute."); }
+  renderNotif();
+}
+function renderNotif() {
+  const on = !!mySub && pushSupported && Notification.permission === "granted";
+  const blocked = pushSupported && Notification.permission === "denied";
+  const hint = !pushSupported ? (isIOS && !standalone ? "On iPhone: Share → Add to Home Screen, then open the app from the icon to turn these on." : "Not supported in this browser.")
+    : on ? `On for ${me || "this phone"}.` : blocked ? "Blocked. Allow notifications for this app in your phone's settings." : "Get reminders from the Fozzfather.";
+  $("notifHint").textContent = hint;
+  $("notifBtn").hidden = on || blocked || !pushSupported;
+  $("homeNotif").hidden = on || blocked || !me || (!pushSupported && !(isIOS && !standalone));
+  $("homeNotifBtn").hidden = !pushSupported;
+}
+$("notifBtn").addEventListener("click", turnOnNotifications);
+$("homeNotifBtn").addEventListener("click", turnOnNotifications);
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").then(async reg => {
+  swReg = reg;
+  if (pushSupported) mySub = await reg.pushManager.getSubscription();
+  if (mySub && me) saveSub(mySub).catch(() => {}); // keeps the name on this phone's subscription up to date
+  renderNotif();
+}).catch(() => renderNotif());
+
+function renderAll() { renderMe(); renderHome(); renderOverdue(); renderPeople(); renderComments(); renderExtension(); renderAway(); renderSupplies(); renderHistory(); renderUpcoming(); renderCalendar(); renderInfo(); renderMoney(); renderNotif(); }
 
 async function refresh() {
   if (busy) return;

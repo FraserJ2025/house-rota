@@ -1,1 +1,4 @@
 .db-password
+.vapid.json
+.supabase-token
+.cron-secret
