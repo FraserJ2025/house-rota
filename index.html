@@ -28,6 +28,7 @@
   --warn: #f0935c; --warn-soft: #3a2316; --away: #b7a6f0; --away-soft: #2a2442; --red: #d33a3a; --red-ink: #ffffff; color-scheme: dark } }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
+a { color: var(--accent); }
 body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.45; -webkit-tap-highlight-color: transparent; }
 .wrap { max-width: 520px; margin: 0 auto;
   padding: calc(16px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(40px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
@@ -182,6 +183,33 @@ input[type=date] { width: 100%; min-width: 0; border: 1px solid var(--line); bac
 .notif > div { min-width: 0; }
 .notif p { margin: 2px 0 0; }
 
+.custom { display: grid; gap: 8px; }
+.custom label { display: grid; grid-template-columns: 1fr 7em; align-items: center; gap: 8px; font-weight: 700; }
+.custom input { width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 8px 10px; min-height: 40px; font: inherit; color: inherit; }
+.photo { display: block; border: 1px dashed var(--line); border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; font-weight: 700; color: var(--accent); }
+.photo input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.photo:focus-within { outline: 3px solid var(--accent); outline-offset: 2px; }
+.dates select { width: 100%; }
+.amt { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+.owe { color: var(--red); } .owed { color: var(--done); }
+.thumb { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; flex: none; border: 1px solid var(--line); }
+.list li .actions { display: flex; gap: 6px; align-items: center; flex: none; }
+.nets summary { font-size: 14px; }
+.nets .mini { margin-top: 8px; }
+
+/* ---- Notifications bell ---- */
+.bell { position: fixed; z-index: 25; top: calc(10px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px));
+  width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); display: grid; place-items: center; cursor: pointer; box-shadow: 0 2px 8px -4px rgba(0,0,0,.3); }
+.bell svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.bell.off::after { content: ""; position: absolute; top: 6px; right: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--red); border: 2px solid var(--surface); }
+.bell:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.screen > header:first-child, .screen > .hello { padding-right: 52px; }
+dialog.sheet { border: 0; border-radius: 18px; padding: 20px; width: min(92vw, 420px); background: var(--surface); color: var(--ink); }
+dialog.sheet::backdrop { background: rgba(0,0,0,.45); }
+dialog.sheet h2 { font-size: 22px; margin-bottom: 8px; }
+dialog.sheet ol { padding-left: 20px; margin: 8px 0; display: grid; gap: 6px; }
+dialog.sheet .row { margin-top: 12px; }
+
 /* ---- House info ---- */
 .info { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; }
 .info dt { color: var(--muted); font-size: 14px; }
@@ -289,22 +317,52 @@ input[type=date] { width: 100%; min-width: 0; border: 1px solid var(--line); bac
   </main>
 
   <main class="screen" data-screen="money" hidden>
-    <header><span class="eyebrow">Bills &amp; Splitwise</span><h1>Money</h1></header>
-    <a class="btn primary bigbtn" href="https://secure.splitwise.com/#/groups/102632907" target="_blank" rel="noopener">Open Everard on Splitwise ↗</a>
-    <p class="hint">Balances and expenses stay in Splitwise. Log bills due here and the Fozzfather reminds everyone the day before.</p>
+    <header><span class="eyebrow">House money</span><h1>Money</h1></header>
+
     <section class="card">
-      <div class="sechead"><h2 class="sec">Bills due</h2></div>
-      <ul class="list" id="billsList"></ul>
+      <p class="big" id="myBalance">Balances</p>
+      <div class="sechead"><h2 class="sec">Who pays who</h2><p>The fewest payments to square everyone up.</p></div>
+      <ul class="list" id="settleList"></ul>
+      <details class="nets"><summary>Everyone's balance</summary><ul class="mini" id="netList"></ul></details>
     </section>
+
     <section class="card">
-      <div class="sechead"><h2 class="sec">Add a bill due</h2></div>
+      <div class="sechead"><h2 class="sec">Add an expense</h2></div>
+      <input type="text" id="exDesc" maxlength="60" placeholder="What was it? e.g. Asda shop">
+      <div class="dates">
+        <label>Amount (£)<input type="text" id="exAmount" inputmode="decimal" maxlength="10" placeholder="0.00"></label>
+        <label>Paid by<select id="exPaidBy"></select></label>
+      </div>
+      <div>
+        <p class="hint" style="margin-bottom:6px">Split between</p>
+        <div class="seg" id="exSplitWho" role="group" aria-label="Split between"></div>
+      </div>
+      <div class="seg" id="exSplitMode" role="group" aria-label="How to split"></div>
+      <div id="exCustom" class="custom" hidden></div>
+      <label class="photo">
+        <input type="file" id="exReceipt" accept="image/*">
+        <span id="exReceiptLabel">📎 Add receipt photo (optional)</span>
+      </label>
+      <p class="hint" id="exPreview"></p>
+      <button class="btn primary" id="exAdd" type="button">Add expense</button>
+    </section>
+
+    <section class="card">
+      <div class="sechead"><h2 class="sec">Activity</h2></div>
+      <ul class="list" id="exList"></ul>
+    </section>
+
+    <section class="card">
+      <div class="sechead"><h2 class="sec">Bills due</h2><p>The Fozzfather reminds everyone the day before.</p></div>
+      <ul class="list" id="billsList"></ul>
       <input type="text" id="billTitle" maxlength="60" placeholder="e.g. Energy bill">
       <div class="dates">
         <label>Due<input type="date" id="billDate"></label>
         <label>Amount (optional)<input type="text" id="billAmount" maxlength="20" placeholder="£85"></label>
       </div>
-      <button class="btn primary" id="billAdd" type="button">Add bill</button>
+      <button class="btn" id="billAdd" type="button">Add bill</button>
     </section>
+    <p class="hint">Older history is still on <a href="https://secure.splitwise.com/#/groups/102632907" target="_blank" rel="noopener">Splitwise</a>.</p>
   </main>
 
   <main class="screen" data-screen="house" hidden>
@@ -339,6 +397,9 @@ input[type=date] { width: 100%; min-width: 0; border: 1px solid var(--line); bac
     </section>
   </main>
 </div>
+
+<button class="bell off" id="bell" type="button" aria-label="Notifications"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>
+<dialog class="sheet" id="notifSheet"><div id="notifSheetBody"></div><div class="row"><button class="btn" id="notifClose" type="button">Close</button></div></dialog>
 
 <p class="toast" id="status" role="status" aria-live="polite"></p>
 
@@ -861,8 +922,9 @@ function renderHome() {
   // Money (Splitwise comes in stage 2)
   const hm = $("homeMoney"); hm.innerHTML = "";
   const g3 = el("div", "go"); g3.append(el("p", "big", "Money")); hm.append(g3);
-  const nextBill = upcomingBills()[0];
-  hm.append(el("p", "hint", nextBill ? `Next bill: ${nextBill.title} · ${fmtDay(parseDay(nextBill.start))}${nextBill.note ? " · " + nextBill.note : ""}` : "No bills logged. Balances are in Splitwise."));
+  const myNet = me ? nets()[me] : 0, nextBill = upcomingBills()[0];
+  hm.append(el("p", "amt " + (myNet < 0 ? "owe" : myNet > 0 ? "owed" : ""), !me ? "" : myNet < 0 ? `You owe ${gbp(myNet)}` : myNet > 0 ? `You're owed ${gbp(myNet)}` : "You're all square"));
+  if (nextBill) hm.append(el("p", "hint", `Next bill: ${nextBill.title} · ${fmtDay(parseDay(nextBill.start))}${nextBill.note ? " · " + nextBill.note : ""}`));
 
   // Running low
   const hl = $("homeLow"), needed = (store.supplies?.items || []).filter(i => !i.got);
@@ -872,22 +934,158 @@ function renderHome() {
 }
 
 
-// ---- Money ----
-const upcomingBills = () => (store.calendar?.events || []).filter(e => e.type === "bill" && e.start >= todayKey()).sort((a, b) => a.start.localeCompare(b.start));
+// ---- Money (the house's own Splitwise) ----
+// store.money = { opening: {name: pence}, openingNote, expenses: [{id, desc, amount, paidBy, split: {name: pence}, date, receipt, by, at}],
+//                 settlements: [{id, from, to, amount, date, by, at}] }
+const gbp = p => "£" + (Math.abs(p) / 100).toFixed(2);
+const toPence = v => { const n = Math.round(parseFloat(String(v).replace(/[£,\s]/g, "")) * 100); return Number.isFinite(n) && n > 0 ? n : null; };
+function nets() {
+  const m = store.money || {}, n = Object.fromEntries(PEOPLE.map(p => [p, 0]));
+  for (const [p, v] of Object.entries(m.opening || {})) n[p] = (n[p] || 0) + v;
+  for (const e of m.expenses || []) { n[e.paidBy] += e.amount; for (const [p, v] of Object.entries(e.split)) n[p] -= v; }
+  for (const t of m.settlements || []) { n[t.from] += t.amount; n[t.to] -= t.amount; }
+  return n;
+}
+function simplify(n) {
+  const cred = Object.entries(n).filter(([, v]) => v > 0).map(([p, v]) => [p, v]).sort((a, b) => b[1] - a[1]);
+  const debt = Object.entries(n).filter(([, v]) => v < 0).map(([p, v]) => [p, -v]).sort((a, b) => b[1] - a[1]);
+  const out = [];
+  while (cred.length && debt.length) {
+    const x = Math.min(cred[0][1], debt[0][1]);
+    if (x > 0) out.push({ from: debt[0][0], to: cred[0][0], amount: x });
+    cred[0][1] -= x; debt[0][1] -= x;
+    if (cred[0][1] === 0) cred.shift(); if (debt[0][1] === 0) debt.shift();
+  }
+  return out;
+}
+function equalSplit(total, people) {
+  const base = Math.floor(total / people.length), rem = total - base * people.length;
+  return Object.fromEntries(people.map((p, i) => [p, base + (i < rem ? 1 : 0)]));
+}
+let exWho = new Set(PEOPLE), exMode = "equal", exFile = null, confirmSettle = null;
 function renderMoney() {
-  const ul = $("billsList"), bills = upcomingBills();
-  ul.textContent = "";
-  if (!bills.length) ul.append(el("li", "empty", "No bills due. Add one below."));
-  for (const e of bills) {
+  const n = nets(), pays = simplify(n);
+  // My balance
+  const mb = $("myBalance"); mb.className = "big";
+  if (!me) mb.textContent = "Balances";
+  else if (n[me] < 0) { mb.textContent = `You owe ${gbp(n[me])}`; mb.classList.add("owe"); }
+  else if (n[me] > 0) { mb.textContent = `You're owed ${gbp(n[me])}`; mb.classList.add("owed"); }
+  else mb.textContent = "You're all square";
+  // Who pays who
+  const sl = $("settleList"); sl.textContent = "";
+  if (!pays.length) sl.append(el("li", "empty", "Everyone's square."));
+  for (const t of pays) {
     const li = el("li"), what = el("div", "what");
-    const days = Math.round((parseDay(e.start) - parseDay(todayKey())) / DAY);
+    what.append(el("b", null, `${t.from} pays ${t.to}`), el("small", null, t.from === me ? "That's you" : t.to === me ? "Coming to you" : ""));
+    const k = t.from + ">" + t.to, b = el("button", "btn small" + (confirmSettle === k ? " primary" : ""), confirmSettle === k ? `Confirm ${gbp(t.amount)} paid` : "Settle up"); b.type = "button";
+    b.addEventListener("click", () => {
+      if (confirmSettle !== k) { confirmSettle = k; renderMoney(); return; }
+      confirmSettle = null;
+      const st = { id: uid(), from: t.from, to: t.to, amount: t.amount, date: todayKey(), by: me || null, at: Date.now() };
+      change("money", x => ({ ...x, settlements: [...(x.settlements || []), st] }), `Recorded: ${t.from} paid ${t.to} ${gbp(t.amount)}.`).then(() => fozz({ mode: "settle", id: st.id }));
+    });
+    const actions = el("div", "actions"); actions.append(el("span", "amt", gbp(t.amount)), b);
+    li.append(what, actions); sl.append(li);
+  }
+  const nl = $("netList"); nl.textContent = "";
+  for (const p of PEOPLE) { const li = el("li"); li.append(el("span", "when", p), el("span", "amt " + (n[p] < 0 ? "owe" : n[p] > 0 ? "owed" : ""), n[p] < 0 ? `owes ${gbp(n[p])}` : n[p] > 0 ? `gets back ${gbp(n[p])}` : "square")); nl.append(li); }
+
+  // Add form
+  const pb = $("exPaidBy"); if (!pb.children.length) PEOPLE.forEach(p => pb.append(new Option(p, p)));
+  if (!pb.dataset.touched) pb.value = me || PEOPLE[0];
+  const who = $("exSplitWho"); who.textContent = "";
+  PEOPLE.forEach(p => { const b = el("button", "btn small", p); b.type = "button"; b.setAttribute("aria-pressed", String(exWho.has(p)));
+    b.addEventListener("click", () => { exWho.has(p) ? exWho.delete(p) : exWho.add(p); renderMoney(); }); who.append(b); });
+  const mode = $("exSplitMode"); mode.textContent = "";
+  [["equal", "Split equally"], ["custom", "Custom amounts"]].forEach(([id, label]) => { const b = el("button", "btn small", label); b.type = "button"; b.setAttribute("aria-pressed", String(exMode === id));
+    b.addEventListener("click", () => { exMode = id; renderMoney(); }); mode.append(b); });
+  const cu = $("exCustom"); cu.hidden = exMode !== "custom";
+  if (exMode === "custom") {
+    const keep = Object.fromEntries([...cu.querySelectorAll("input")].map(i => [i.dataset.p, i.value]));
+    cu.textContent = "";
+    [...exWho].forEach(p => { const l = el("label", null, p), i = el("input"); i.type = "text"; i.inputMode = "decimal"; i.placeholder = "0.00"; i.dataset.p = p; i.id = "exc-" + p; i.value = keep[p] || ""; i.addEventListener("input", updatePreview); l.append(i); cu.append(l); });
+  }
+  updatePreview();
+
+  // Activity
+  const m = store.money || {}, ul = $("exList"); ul.textContent = "";
+  const items = [...(m.expenses || []).map(e => ({ ...e, kind: "ex" })), ...(m.settlements || []).map(t => ({ ...t, kind: "st" }))].sort((a, b) => b.at - a.at);
+  if (m.opening) items.push({ kind: "open", at: 0 });
+  if (!items.length) ul.append(el("li", "empty", "No expenses yet."));
+  for (const it of items.slice(0, 40)) {
+    const li = el("li"), what = el("div", "what");
+    if (it.kind === "ex") {
+      if (it.receipt) { const a = el("a"); a.href = it.receipt; a.target = "_blank"; a.rel = "noopener"; const img = el("img", "thumb"); img.src = it.receipt; img.alt = "Receipt"; a.append(img); li.append(a); }
+      const parts = Object.keys(it.split), mine = it.split[me];
+      what.append(el("b", null, `${it.desc} · ${gbp(it.amount)}`), el("small", null, [`${it.paidBy} paid`, `split ${parts.length === PEOPLE.length ? "4 ways" : "with " + list(parts)}`, fmtDay(parseDay(it.date)), me && it.paidBy !== me && mine ? `your share ${gbp(mine)}` : ""].filter(Boolean).join(" · ")));
+      li.append(what);
+      if (me && it.by === me) { const b = el("button", "btn small", "Delete"); b.type = "button"; b.addEventListener("click", () => change("money", x => ({ ...x, expenses: (x.expenses || []).filter(y => y.id !== it.id) }), "Expense deleted.")); li.append(b); }
+    } else if (it.kind === "st") {
+      what.append(el("b", null, `${it.from} paid ${it.to} ${gbp(it.amount)}`), el("small", null, `Settle up · ${fmtDay(parseDay(it.date))}`)); li.append(what);
+      if (me && it.by === me) { const b = el("button", "btn small", "Undo"); b.type = "button"; b.addEventListener("click", () => change("money", x => ({ ...x, settlements: (x.settlements || []).filter(y => y.id !== it.id) }), "Settle up removed.")); li.append(b); }
+    } else {
+      what.append(el("b", null, "Brought over from Splitwise"), el("small", null, m.openingNote || "Balances carried over")); li.append(what);
+    }
+    ul.append(li);
+  }
+
+  // Bills due
+  const bl = $("billsList"), bills = upcomingBills(); bl.textContent = "";
+  if (!bills.length) bl.append(el("li", "empty", "No bills due."));
+  for (const e of bills) {
+    const li = el("li"), what = el("div", "what"), days = Math.round((parseDay(e.start) - parseDay(todayKey())) / DAY);
     what.append(el("b", null, e.title + (e.note ? ` · ${e.note}` : "")), el("small", null, `${fmtDay(parseDay(e.start))} · ${days === 0 ? "today" : days === 1 ? "tomorrow" : `in ${days} days`}`));
     const b = el("button", "btn small", "Paid"); b.type = "button";
-    b.addEventListener("click", () => change("calendar", x => ({ events: (x.events || []).filter(y => y.id !== e.id) }), "Marked as paid."));
-    li.append(what, b); ul.append(li);
+    b.addEventListener("click", () => change("calendar", x => ({ events: (x.events || []).filter(y => y.id !== e.id) }), "Bill cleared."));
+    li.append(what, b); bl.append(li);
   }
   if (!$("billDate").value) $("billDate").value = todayKey();
 }
+const list = xs => xs.length <= 1 ? xs.join("") : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1];
+function currentSplit() {
+  const total = toPence($("exAmount").value), people = PEOPLE.filter(p => exWho.has(p));
+  if (!people.length) return { error: "Pick who it's split between." };
+  if (exMode === "equal") return total ? { total, split: equalSplit(total, people) } : { error: "Enter the amount." };
+  const split = {}; let sum = 0;
+  for (const p of people) { const v = toPence($("exc-" + p)?.value || ""); if (v) { split[p] = v; sum += v; } }
+  if (!sum) return { error: "Enter how much each person owes." };
+  if (total && total !== sum) return { error: `Shares add up to ${gbp(sum)}, not ${gbp(total)}.` };
+  return { total: sum, split };
+}
+function updatePreview() {
+  const r = currentSplit(), pv = $("exPreview");
+  pv.textContent = r.error && $("exAmount").value ? r.error : r.split ? Object.entries(r.split).map(([p, v]) => `${p} ${gbp(v)}`).join(" · ") : "";
+}
+$("exAmount").addEventListener("input", updatePreview);
+$("exPaidBy").addEventListener("change", e => { e.target.dataset.touched = "1"; });
+$("exReceipt").addEventListener("change", e => { exFile = e.target.files[0] || null; $("exReceiptLabel").textContent = exFile ? "📎 " + exFile.name : "📎 Add receipt photo (optional)"; });
+async function shrinkImage(file) {
+  const img = await createImageBitmap(file), scale = Math.min(1, 1400 / Math.max(img.width, img.height));
+  const c = document.createElement("canvas"); c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+  c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+  return await new Promise(r => c.toBlob(r, "image/jpeg", 0.8));
+}
+async function uploadReceipt(file) {
+  const blob = await shrinkImage(file), path = `${todayKey()}/${uid()}.jpg`;
+  const r = await fetch(`${SUPABASE_URL}/storage/v1/object/receipts/${path}`, { method: "POST", headers: { apikey: ANON_JWT, Authorization: "Bearer " + ANON_JWT, "Content-Type": "image/jpeg" }, body: blob });
+  if (!r.ok) throw new Error("upload " + r.status);
+  return `${SUPABASE_URL}/storage/v1/object/public/receipts/${path}`;
+}
+$("exAdd").addEventListener("click", async () => {
+  const desc = $("exDesc").value.trim(); if (!desc) { say("Say what the expense was."); return; }
+  const r = currentSplit(); if (r.error) { say(r.error); return; }
+  const btn = $("exAdd"); btn.disabled = true; btn.textContent = exFile ? "Uploading receipt…" : "Adding…";
+  try {
+    const receipt = exFile ? await uploadReceipt(exFile) : null;
+    const ex = { id: uid(), desc, amount: r.total, paidBy: $("exPaidBy").value, split: r.split, date: todayKey(), receipt, by: me || null, at: Date.now() };
+    await change("money", x => ({ ...x, expenses: [...(x.expenses || []), ex] }), `${desc} added. Everyone involved gets a heads-up.`);
+    fozz({ mode: "expense", id: ex.id });
+    $("exDesc").value = ""; $("exAmount").value = ""; $("exReceipt").value = ""; exFile = null; $("exReceiptLabel").textContent = "📎 Add receipt photo (optional)";
+    $("exCustom").textContent = ""; exWho = new Set(PEOPLE); exMode = "equal"; delete $("exPaidBy").dataset.touched; renderMoney();
+  } catch (e) { say("Couldn't upload the receipt. Try a smaller photo or add it without one."); }
+  finally { btn.disabled = false; btn.textContent = "Add expense"; }
+});
+const upcomingBills = () => (store.calendar?.events || []).filter(e => e.type === "bill" && e.start >= todayKey()).sort((a, b) => a.start.localeCompare(b.start));
 $("billAdd").addEventListener("click", () => {
   const title = $("billTitle").value.trim(), start = $("billDate").value, amount = $("billAmount").value.trim();
   if (!title) { say("Give the bill a name first."); return; }
@@ -901,6 +1099,7 @@ $("billAdd").addEventListener("click", () => {
 const VAPID_PUBLIC = "BIiFwsbUQIrzQ6kbyEJxu8GK9YV5yjq4aPAih4dyyzCxTp24pDo39Xi6xENh-7urZu0xdr3k5FQVkVurfSOBZJ8";
 const FOZZ_URL = SUPABASE_URL + "/functions/v1/fozzfather";
 const ANON_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpvY3hmZWZ5ZGdkcHNuaGhnZ2dhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQyMzg2MTUsImV4cCI6MjEwOTgxNDYxNX0.DirBJZFrRK-IefVvelk3pUrcKORrqu7JpFWNPV0qnxY"; // public anon key, needed to call the function
+const fozz = body => fetch(FOZZ_URL, { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + ANON_JWT }, body: JSON.stringify(body) }).catch(() => {});
 const pushSupported = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
 const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
 const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
@@ -934,7 +1133,37 @@ function renderNotif() {
   $("notifBtn").hidden = on || blocked || !pushSupported;
   $("homeNotif").hidden = on || blocked || !me || (!pushSupported && !(isIOS && !standalone));
   $("homeNotifBtn").hidden = !pushSupported;
+  $("bell").classList.toggle("off", !on);
+  $("bell").setAttribute("aria-label", on ? "Notifications on" : "Turn on notifications");
 }
+function openNotifSheet() {
+  const box = $("notifSheetBody"), on = !!mySub && pushSupported && Notification.permission === "granted";
+  box.textContent = "";
+  box.append(el("h2", null, on ? "Notifications are on" : "Hear from the Fozzfather"));
+  if (on) {
+    box.append(el("p", "hint", `This phone gets the Fozzfather's messages for ${me || "you"}: your cleaning, overdue rooms, bills due, new expenses and what's on.`));
+    const b = el("button", "btn primary", "Send me a test"); b.type = "button";
+    b.addEventListener("click", () => { fozz({ mode: "welcome", endpoint: mySub.endpoint }); say("Sent. It should pop up in a few seconds."); });
+    const r = el("div", "row"); r.append(b); box.append(r);
+  } else if (!pushSupported && isIOS && !standalone) {
+    box.append(el("p", "hint", "On iPhone, notifications only work from the Home Screen app:"));
+    const ol = el("ol"); ["Tap the Share button (the square with an arrow) at the bottom of Safari", "Scroll down and tap Add to Home Screen, then Add", "Close Safari and open The House from your Home Screen", "Tap this bell again and turn notifications on"].forEach(t => ol.append(el("li", null, t)));
+    box.append(ol, el("p", "hint", "Needs iOS 16.4 or newer."));
+  } else if (!pushSupported) {
+    box.append(el("p", "hint", "This browser can't show notifications. Open the app in Chrome (Android) or add it to your Home Screen (iPhone)."));
+  } else if (Notification.permission === "denied") {
+    box.append(el("p", "hint", isIOS ? "They're blocked. Go to Settings → Notifications → The House and allow them, then come back." : "They're blocked. Open your phone's settings for this app (or the site settings in Chrome), allow notifications, then come back."));
+  } else {
+    if (!me) box.append(el("p", "hint", "First, pick who you are on the Home screen."));
+    box.append(el("p", "hint", "Reminders for your cleaning, overdue rooms, bills due, new expenses and what's on. Your phone will ask you to allow them."));
+    const b = el("button", "btn primary", "Turn on notifications"); b.type = "button"; b.disabled = !me;
+    b.addEventListener("click", async () => { await turnOnNotifications(); openNotifSheet(); });
+    const r = el("div", "row"); r.append(b); box.append(r);
+  }
+  if (!$("notifSheet").open) $("notifSheet").showModal();
+}
+$("bell").addEventListener("click", openNotifSheet);
+$("notifClose").addEventListener("click", () => $("notifSheet").close());
 $("notifBtn").addEventListener("click", turnOnNotifications);
 $("homeNotifBtn").addEventListener("click", turnOnNotifications);
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").then(async reg => {

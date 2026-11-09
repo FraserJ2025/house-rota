@@ -37,6 +37,15 @@ function london() {
   return { today, hour: +parts.hour, dow, monday: today - dow * DAY };
 }
 
+const gbp = (p: number) => "£" + (Math.abs(p) / 100).toFixed(2);
+function nets(m: any) {
+  const n: Record<string, number> = Object.fromEntries(PEOPLE.map(p => [p, 0]));
+  for (const [p, v] of Object.entries(m.opening || {})) n[p] += v as number;
+  for (const e of m.expenses || []) { n[e.paidBy] += e.amount; for (const [p, v] of Object.entries(e.split)) n[p] -= v as number; }
+  for (const t of m.settlements || []) { n[t.from] += t.amount; n[t.to] -= t.amount; }
+  return n;
+}
+
 type Msg = { person: string; title: string; body: string; url: string; tag: string };
 
 async function compute(now = london()): Promise<Msg[]> {
@@ -83,6 +92,12 @@ async function compute(now = london()): Promise<Msg[]> {
     }
   }
 
+  // Sunday 12:00: settle-up nudge for anyone who owes money
+  if (now.dow === 6 && now.hour === 12) {
+    const n = nets(store.money || {});
+    for (const p of PEOPLE) if (n[p] < 0) send(p, `💷 You owe ${gbp(n[p])} in the house. Settle up in the Money tab when you can.`, "owe", APP + "#money");
+  }
+
   // Saturday 10:00: shopping list
   if (now.dow === 5 && now.hour === 10) {
     const needed = ((store.supplies?.items || []) as any[]).filter(i => !i.got).map(i => i.name);
@@ -116,7 +131,34 @@ Deno.serve(async req => {
     const msg = { person: "", title: "The Fozzfather", body: "It's the Fozzfather. You'll hear from me about cleaning, bills and the house.", url: APP + "#home", tag: "welcome" };
     return json(await deliver([msg], body.endpoint));
   }
+  // New expense / settle up: notify the people involved, once per item
+  if ((body.mode === "expense" || body.mode === "settle") && typeof body.id === "string") {
+    const { data: rows } = await db.from("rota").select("key,data").in("key", ["money", "fozz:items"]);
+    const get = (k: string) => (rows || []).find((r: any) => r.key === k)?.data || {};
+    const money = get("money"), done: string[] = get("fozz:items").ids || [];
+    if (done.includes(body.id)) return json({ skipped: "already sent" });
+    const msgs: Msg[] = [];
+    if (body.mode === "expense") {
+      const e = (money.expenses || []).find((x: any) => x.id === body.id);
+      if (!e) return json({ error: "not found" }, 404);
+      for (const [p, share] of Object.entries(e.split) as [string, number][]) if (p !== e.paidBy)
+        msgs.push({ person: p, title: "The Fozzfather", body: `${e.paidBy} added ${e.desc} · ${gbp(e.amount)}. Your share: ${gbp(share)}.`, url: APP + "#money", tag: "ex-" + e.id });
+    } else {
+      const t = (money.settlements || []).find((x: any) => x.id === body.id);
+      if (!t) return json({ error: "not found" }, 404);
+      msgs.push({ person: t.to, title: "The Fozzfather", body: `${t.from} says they've paid you ${gbp(t.amount)}. Check it's arrived.`, url: APP + "#money", tag: "st-" + t.id });
+    }
+    await db.from("rota").upsert({ key: "fozz:items", data: { ids: [...done, body.id].slice(-200) } });
+    return json(await deliver(msgs));
+  }
+
   if (!authed) return json({ error: "not allowed" }, 401);
+
+  // Message everyone who has notifications on
+  if (body.mode === "broadcast" && typeof body.body === "string") {
+    const msgs = PEOPLE.map(p => ({ person: p, title: "The Fozzfather", body: body.body, url: APP + "#home", tag: "broadcast" }));
+    return json(await deliver(msgs));
+  }
 
   if (body.mode === "preview") return json(await compute(body.at ? { ...london(), ...body.at } : london()));
   if (body.mode === "tick") {
