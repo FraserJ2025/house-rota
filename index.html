@@ -14,22 +14,35 @@
 <style>
 :root {
   --bg: #eef4f5; --surface: #ffffff; --ink: #15292e; --muted: #5b7176; --line: #d3e1e4;
-  --accent: #0f7c86; --glove: #f2c230; --glove-ink: #3d2f00;
+  --accent: #0f7c86; --accent-soft: #d6eef0; --glove: #f2c230; --glove-ink: #3d2f00;
   --done: #2f8a4c; --done-soft: #dcf1e2; --warn: #b5541c; --warn-soft: #fbe6d8;
+  --away: #6a55b0; --away-soft: #ebe6f8;
   --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
   --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) { :root {
   --bg: #0e1a1d; --surface: #16262a; --ink: #e4f0f2; --muted: #93abb0; --line: #27403f;
-  --accent: #4cc3cc; --done: #5fcf83; --done-soft: #183526; --warn: #f0935c; --warn-soft: #3a2316; color-scheme: dark } }
+  --accent: #4cc3cc; --accent-soft: #173a3e; --done: #5fcf83; --done-soft: #183526;
+  --warn: #f0935c; --warn-soft: #3a2316; --away: #b7a6f0; --away-soft: #2a2442; color-scheme: dark } }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.45; -webkit-tap-highlight-color: transparent; }
 .wrap { max-width: 520px; margin: 0 auto;
-  padding: calc(20px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(40px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  padding: calc(16px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(40px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
   display: grid; gap: 22px; }
 h1, h2 { font-family: var(--display); margin: 0; text-wrap: balance; }
 .eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; }
+button, input, select { font: inherit; color: inherit; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 9px 14px; cursor: pointer; font-weight: 700; min-height: 42px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.small { min-height: 34px; padding: 5px 10px; font-size: 14px; }
+.btn:focus-visible, .room:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.btn[disabled] { opacity: .5; cursor: default; }
+input[type=text], select { width: 100%; min-width: 0; border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 9px 12px; min-height: 42px; }
+
+.me { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--muted); }
+.me select { width: auto; min-height: 34px; padding: 4px 8px; background: var(--surface); }
+
 header { display: grid; gap: 6px; }
 header h1 { font-size: 30px; font-weight: 800; line-height: 1.05; }
 .pair { color: var(--accent); }
@@ -40,13 +53,17 @@ header h1 { font-size: 30px; font-weight: 800; line-height: 1.05; }
 .bar { height: 10px; background: var(--line); border-radius: 999px; overflow: hidden; }
 .bar > span { display: block; height: 100%; width: 0; background: var(--done); transition: width .3s ease; }
 .progress small { color: var(--muted); font-variant-numeric: tabular-nums; }
+
 .people { display: grid; gap: 14px; }
-.person { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; }
 .person h2 { font-size: 20px; font-weight: 600; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
 .person h2 small { font-family: var(--body); font-size: 13px; color: var(--muted); font-weight: 400; }
+.note { font-size: 14px; border-radius: 10px; padding: 8px 10px; }
+.note.ext { background: var(--accent-soft); color: var(--accent); }
+.note.away { background: var(--away-soft); color: var(--away); }
+.note b { font-weight: 700; }
 .rooms { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.room { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; font: inherit; color: inherit; background: var(--bg); border: 1px solid transparent; border-radius: 10px; padding: 12px; cursor: pointer; min-height: 52px; }
-.room:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.room { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: var(--bg); border: 1px solid transparent; border-radius: 10px; padding: 12px; cursor: pointer; min-height: 52px; }
 .room[disabled] { cursor: default; opacity: .75; }
 .tick { flex: none; width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--muted); display: grid; place-items: center; }
 .tick svg { width: 16px; height: 16px; opacity: 0; }
@@ -57,14 +74,37 @@ header h1 { font-size: 30px; font-weight: 800; line-height: 1.05; }
 .rname { font-weight: 700; }
 .rhint { display: block; font-size: 13px; color: var(--muted); }
 .status { font-size: 13px; color: var(--muted); min-height: 1.2em; margin: -8px 0 0; }
-section > h2.sec { font-size: 18px; font-weight: 600; margin-bottom: 10px; }
-.weeks { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
-.weeks li { display: grid; grid-template-columns: 5.5em 1fr; gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
-.weeks .date { color: var(--muted); }
-.weeks .who { min-width: 0; }
-.chips { grid-column: 2; display: flex; flex-wrap: wrap; gap: 6px; }
+
+section > h2.sec { font-size: 20px; font-weight: 600; }
+.sechead { display: grid; gap: 4px; margin-bottom: 10px; }
+.sechead p { margin: 0; color: var(--muted); font-size: 14px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.row > input { flex: 1 1 160px; }
+.seg { display: flex; gap: 6px; flex-wrap: wrap; }
+.seg button[aria-pressed=true] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.hint { font-size: 13px; color: var(--muted); margin: 0; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--done-soft); color: var(--done); font-weight: 700; }
 .chip.miss { background: var(--warn-soft); color: var(--warn); }
+.chip.away { background: var(--away-soft); color: var(--away); }
+.chip.ext { background: var(--accent-soft); color: var(--accent); }
+.addchip { border: 1px dashed var(--line); background: transparent; border-radius: 999px; padding: 6px 12px; font-size: 14px; cursor: pointer; min-height: 36px; }
+.addchip:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.list li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.list li .what { min-width: 0; }
+.list li .what b { display: block; }
+.list li .what small { color: var(--muted); font-size: 13px; }
+.list li.got .what b { text-decoration: line-through; color: var(--muted); }
+.list li.empty { display: block; color: var(--muted); font-size: 14px; }
+
+.weeks { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.weeks li { display: grid; grid-template-columns: 4.2em 1fr; gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.weeks .date { color: var(--muted); }
+.weeks .who { min-width: 0; }
+.weeks .chips { grid-column: 2; }
 .weeks li.empty { display: block; color: var(--muted); font-size: 14px; }
 details { color: var(--muted); font-size: 14px; }
 details summary { cursor: pointer; font-weight: 700; color: var(--ink); }
@@ -74,6 +114,14 @@ details p { margin: 8px 0 0; }
 </head>
 <body>
 <div class="wrap">
+  <div class="me">
+    <span id="meText">Who's using this phone?</span>
+    <select id="meSelect" aria-label="Who are you?">
+      <option value="">Choose…</option>
+      <option>Fraser</option><option>Ewan</option><option>Tom</option><option>Jayden</option>
+    </select>
+  </div>
+
   <header>
     <span class="eyebrow" id="weekLabel">This week</span>
     <h1>On cleaning: <span class="pair" id="pairName">…</span></h1>
@@ -88,20 +136,45 @@ details p { margin: 8px 0 0; }
   <section class="people" id="people"></section>
   <p class="status" id="status" role="status"></p>
 
+  <section class="card" id="extCard">
+    <div class="sechead"><h2 class="sec">Need more time?</h2><p id="extIntro">Ask for an extension on your rooms this week.</p></div>
+    <div id="extBody"></div>
+  </section>
+
+  <section class="card">
+    <div class="sechead"><h2 class="sec">Going away?</h2><p>Let everyone know which week you're not around.</p></div>
+    <div class="seg" id="awayWeeks" role="group" aria-label="Which week"></div>
+    <div class="row">
+      <input type="text" id="awayNote" maxlength="80" placeholder="Optional note, e.g. home Thu night">
+      <button class="btn primary" id="awayBtn" type="button">I'm away</button>
+    </div>
+    <p class="hint" id="awayHint"></p>
+  </section>
+
+  <section class="card">
+    <div class="sechead"><h2 class="sec">Running low</h2><p>Tap what we need. Tick it off when you've bought it.</p></div>
+    <div class="chips" id="quickAdd"></div>
+    <div class="row">
+      <input type="text" id="supplyInput" maxlength="40" placeholder="Something else…">
+      <button class="btn" id="supplyBtn" type="button">Add</button>
+    </div>
+    <ul class="list" id="supplies"></ul>
+  </section>
+
   <section>
-    <h2 class="sec">Previous weeks</h2>
+    <div class="sechead"><h2 class="sec">Previous weeks</h2></div>
     <ul class="weeks" id="history"></ul>
   </section>
 
   <section>
-    <h2 class="sec">Coming up</h2>
+    <div class="sechead"><h2 class="sec">Coming up</h2></div>
     <ul class="weeks" id="upcoming"></ul>
   </section>
 
   <details>
     <summary>How the rota works</summary>
     <p>It flips every Monday. Fraser &amp; Ewan take one week, Tom &amp; Jayden the next. Each pair splits the five rooms: one person does the kitchen and hallway, the other does the living room, toilet and shower room. Next time your pair is up, you swap halves.</p>
-    <p>Everything is due by Sunday 23:59. Tap a room when it's done and everyone sees it.</p>
+    <p>Everything is due by Sunday 23:59. You can ask for up to 3 extra days. If you're away on your week, sort a swap with someone and mark it here so everyone knows.</p>
     <p>Keep it on your phone: iPhone, Share → Add to Home Screen. Android, ⋮ → Add to Home screen.</p>
   </details>
 </div>
@@ -111,6 +184,7 @@ details p { margin: 8px 0 0; }
 const SUPABASE_URL = "";      // e.g. https://abcd1234.supabase.co
 const SUPABASE_KEY = "";      // the project's public anon key
 
+const PEOPLE = ["Fraser", "Ewan", "Tom", "Jayden"];
 const PAIRS = [["Fraser", "Ewan"], ["Tom", "Jayden"]];
 const ANCHOR = new Date(2026, 10, 9); // Mon 9 Nov 2026 = Fraser & Ewan, Fraser on the kitchen half
 const HALVES = [
@@ -121,15 +195,18 @@ const HALVES = [
    { id: "shower", name: "Shower room", hint: "Shower, glass, sink, mirror, floor" }]
 ];
 const ALL_ROOMS = HALVES.flat();
+const QUICK = ["Washing-up liquid", "Bleach", "Toilet roll", "Bin bags", "Sponges", "Kitchen roll", "Surface spray", "Hand soap", "Dishwasher tabs"];
 const DAY = 86400000;
 const HISTORY_WEEKS = 4;
 
 const mondayOf = d => { const m = new Date(d.getFullYear(), d.getMonth(), d.getDate()); m.setDate(m.getDate() - ((m.getDay() + 6) % 7)); return m; };
 const addWeeks = (m, n) => { const d = new Date(m); d.setDate(d.getDate() + 7 * n); return d; };
+const addDays = (m, n) => { const d = new Date(m); d.setDate(d.getDate() + n); return d; };
 const weekIndex = m => Math.round((m - ANCHOR) / (7 * DAY));
 const keyOf = m => `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, "0")}-${String(m.getDate()).padStart(2, "0")}`;
 const mod = (n, k) => ((n % k) + k) % k;
 const fmt = d => d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+const fmtDay = d => d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
 function rotaFor(m) {
   const w = weekIndex(m), pair = PAIRS[mod(w, 2)], swap = mod(Math.floor(w / 2), 2) === 1;
   return { pair, people: swap ? [[pair[1], HALVES[0]], [pair[0], HALVES[1]]] : [[pair[0], HALVES[0]], [pair[1], HALVES[1]]] };
@@ -138,129 +215,231 @@ function rotaFor(m) {
 const thisMonday = mondayOf(new Date());
 const thisKey = keyOf(thisMonday);
 const rota = rotaFor(thisMonday);
-let ticks = {};            // { "2026-11-09": { kitchen: true, ... }, ... }
-let connected = false;
 const $ = id => document.getElementById(id);
-const done = () => ticks[thisKey] || {};
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 const TICK = '<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
 
-// ---- Supabase REST (table: ticks(week text primary key, data jsonb)) ----
+// ---- State ----
+// store["week:YYYY-MM-DD"] = { ticks: {room: true}, ext: {Name: {days, reason}}, away: {Name: {note}} }
+// store["supplies"] = { items: [{ id, name, by, at, got, gotBy, gotAt }] }
+let store = {};
+let connected = false;
+let me = "";
+try { me = localStorage.getItem("rota-me") || ""; } catch (e) {}
+const wk = k => store["week:" + k] || {};
+const ticksFor = k => wk(k).ticks || {};
+
+// ---- Supabase REST (table: rota(key text primary key, data jsonb)) ----
 const api = (path, opts = {}) => fetch(`${SUPABASE_URL}/rest/v1/${path}`, { ...opts,
   headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", ...(opts.headers || {}) } });
 async function load() {
-  const from = keyOf(addWeeks(thisMonday, -HISTORY_WEEKS));
-  const r = await api(`ticks?select=week,data&week=gte.${from}`);
+  const r = await api("rota?select=key,data");
   if (!r.ok) throw new Error(r.status);
-  const rows = await r.json();
-  ticks = Object.fromEntries(rows.map(x => [x.week, x.data || {}]));
+  store = Object.fromEntries((await r.json()).map(x => [x.key, x.data || {}]));
 }
-async function save(week, data) {
-  const r = await api("ticks?on_conflict=week", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify({ week, data }) });
+async function save(key, data) {
+  const r = await api("rota?on_conflict=key", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify({ key, data }) });
   if (!r.ok) throw new Error(r.status);
+}
+// Fetch latest, apply a change to one key, save. Keeps other people's edits.
+let busy = false;
+async function change(key, fn, okMsg) {
+  if (!connected) { $("status").textContent = "Saving isn't connected yet."; return; }
+  if (busy) return;
+  busy = true;
+  try {
+    await load();
+    const next = fn(structuredClone(store[key] || {}));
+    store[key] = next; renderAll();
+    await save(key, next);
+    $("status").textContent = okMsg || "Saved. Everyone can see it.";
+  } catch (e) {
+    $("status").textContent = "Couldn't save that. Check your signal and try again.";
+  } finally { busy = false; }
 }
 
+// ---- Deadlines ----
+const baseEnd = m => new Date(addWeeks(m, 1) - 60000);           // Sun 23:59
+const personEnd = (m, name) => addDays(baseEnd(m), (wk(keyOf(m)).ext || {})[name]?.days || 0);
+
 // ---- Render ----
+function renderMe() {
+  $("meSelect").value = me;
+  $("meText").textContent = me ? `Using as ${me}` : "Who's using this phone?";
+}
 function renderHeader() {
-  $("weekLabel").textContent = `Week of ${fmt(thisMonday)} – ${fmt(new Date(addWeeks(thisMonday, 1) - DAY))}`;
+  $("weekLabel").textContent = `Week of ${fmt(thisMonday)} – ${fmt(addDays(thisMonday, 6))}`;
   $("pairName").textContent = rota.pair.join(" & ");
 }
 function renderDeadline() {
-  const el = $("deadline"), d = done();
-  el.className = "deadline";
-  if (ALL_ROOMS.every(r => d[r.id])) { el.textContent = "All done this week"; el.classList.add("ok"); return; }
-  const ms = addWeeks(thisMonday, 1) - 60000 - new Date();
+  const d = ticksFor(thisKey), badge = $("deadline");
+  badge.className = "deadline";
+  if (ALL_ROOMS.every(r => d[r.id])) { badge.textContent = "All done this week"; badge.classList.add("ok"); return; }
+  const ms = baseEnd(thisMonday) - new Date();
+  if (ms < 0) { badge.textContent = "Past Sunday's deadline"; badge.classList.add("late"); return; }
   const days = Math.floor(ms / DAY), hrs = Math.floor((ms % DAY) / 3600000);
-  el.textContent = days >= 1 ? `Due Sun 23:59 · ${days}d ${hrs}h left` : `Due tonight 23:59 · ${hrs}h left`;
-  if (days < 1) el.classList.add("late");
+  badge.textContent = days >= 1 ? `Due Sun 23:59 · ${days}d ${hrs}h left` : `Due tonight 23:59 · ${hrs}h left`;
+  if (days < 1) badge.classList.add("late");
 }
 function renderPeople() {
-  const box = $("people"), d = done();
+  const box = $("people"), d = ticksFor(thisKey), w = wk(thisKey);
   box.textContent = "";
   for (const [name, rooms] of rota.people) {
-    const card = document.createElement("article");
-    card.className = "person";
-    card.innerHTML = `<h2><span></span><small>${rooms.filter(r => d[r.id]).length}/${rooms.length} done</small></h2><ul class="rooms"></ul>`;
-    card.querySelector("h2 span").textContent = name;
+    const card = el("article", "card person");
+    const h = el("h2"); h.append(el("span", null, name), el("small", null, `${rooms.filter(r => d[r.id]).length}/${rooms.length} done`));
+    card.append(h);
+    const ext = (w.ext || {})[name], away = (w.away || {})[name];
+    if (away) { const n = el("div", "note away"); n.append(el("b", null, "Away this week"), document.createTextNode(away.note ? ` · ${away.note}` : "")); card.append(n); }
+    if (ext) { const n = el("div", "note ext"); n.append(el("b", null, `Extension to ${fmtDay(personEnd(thisMonday, name))} 23:59`), document.createTextNode(ext.reason ? ` · ${ext.reason}` : "")); card.append(n); }
+    const ul = el("ul", "rooms");
     for (const r of rooms) {
-      const li = document.createElement("li"), b = document.createElement("button");
-      b.type = "button"; b.className = "room" + (d[r.id] ? " is-done" : "");
+      const li = el("li"), b = el("button", "room" + (d[r.id] ? " is-done" : ""));
+      b.type = "button"; b.disabled = !connected;
       b.setAttribute("aria-pressed", d[r.id] ? "true" : "false");
-      b.disabled = !connected;
       b.innerHTML = `<span class="tick">${TICK}</span><span><span class="rname"></span><span class="rhint"></span></span>`;
       b.querySelector(".rname").textContent = r.name;
       b.querySelector(".rhint").textContent = r.hint;
-      b.addEventListener("click", () => toggle(r.id));
-      li.appendChild(b); card.querySelector("ul").appendChild(li);
+      b.addEventListener("click", () => change("week:" + thisKey, x => ({ ...x, ticks: { ...(x.ticks || {}), [r.id]: !(x.ticks || {})[r.id] } })));
+      li.append(b); ul.append(li);
     }
-    box.appendChild(card);
+    card.append(ul); box.append(card);
   }
   const n = ALL_ROOMS.filter(r => d[r.id]).length;
   $("barFill").style.width = (n / ALL_ROOMS.length * 100) + "%";
   $("progressText").textContent = `${n} of ${ALL_ROOMS.length} rooms done`;
   renderDeadline();
 }
-function weekRow(m, withResults) {
-  const r = rotaFor(m), li = document.createElement("li");
-  li.innerHTML = '<span class="date"></span><span class="who"></span>';
-  li.children[0].textContent = fmt(m);
-  if (!withResults) {
-    li.children[1].textContent = r.people.map(([p, rooms]) => `${p}: ${rooms.map(x => x.name).join(", ")}`).join(" · ");
-    return li;
+
+let extDays = 1;
+function renderExtension() {
+  const body = $("extBody"); body.textContent = "";
+  if (!me) { body.append(el("p", "hint", "Choose who you are at the top first.")); return; }
+  if (!rota.pair.includes(me)) { body.append(el("p", "hint", `You're not on this week, ${me}. You're up next on ${fmt(nextTurn(me))}.`)); return; }
+  const cur = (wk(thisKey).ext || {})[me];
+  if (cur) {
+    body.append(el("p", "hint", `You've got until ${fmtDay(personEnd(thisMonday, me))} 23:59.`));
+    const b = el("button", "btn", "Cancel my extension"); b.type = "button";
+    b.addEventListener("click", () => change("week:" + thisKey, x => { const e = { ...(x.ext || {}) }; delete e[me]; return { ...x, ext: e }; }, "Extension cancelled."));
+    body.append(b); return;
   }
-  const t = ticks[keyOf(m)] || {}, n = ALL_ROOMS.filter(x => t[x.id]).length;
-  li.children[1].textContent = `${r.pair.join(" & ")} · ${n}/5 done`;
-  const chips = document.createElement("div"); chips.className = "chips";
-  for (const [p, rooms] of r.people) for (const x of rooms) {
-    const c = document.createElement("span");
-    c.className = "chip" + (t[x.id] ? "" : " miss");
-    c.textContent = `${t[x.id] ? "✓" : "✗"} ${x.name} (${p})`;
-    chips.appendChild(c);
+  const seg = el("div", "seg"); seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "How long");
+  [1, 2, 3].forEach(n => {
+    const b = el("button", "btn small", `Until ${fmtDay(addDays(baseEnd(thisMonday), n))}`); b.type = "button";
+    b.setAttribute("aria-pressed", String(extDays === n));
+    b.addEventListener("click", () => { extDays = n; renderExtension(); });
+    seg.append(b);
+  });
+  const row = el("div", "row");
+  const inp = el("input"); inp.type = "text"; inp.id = "extReason"; inp.maxLength = 80; inp.placeholder = "Reason, e.g. exams till Sunday";
+  const go = el("button", "btn primary", "Ask for extension"); go.type = "button";
+  go.addEventListener("click", () => change("week:" + thisKey, x => ({ ...x, ext: { ...(x.ext || {}), [me]: { days: extDays, reason: inp.value.trim() } } }), "Extension added. Everyone can see it."));
+  row.append(inp, go);
+  body.append(seg, row);
+}
+function nextTurn(name) { for (let i = 1; i < 4; i++) { const m = addWeeks(thisMonday, i); if (rotaFor(m).pair.includes(name)) return m; } return addWeeks(thisMonday, 1); }
+
+let awayIdx = 0;
+function renderAway() {
+  const seg = $("awayWeeks"); seg.textContent = "";
+  [0, 1, 2, 3].forEach(i => {
+    const m = addWeeks(thisMonday, i);
+    const b = el("button", "btn small", i === 0 ? "This week" : `w/c ${fmt(m)}`); b.type = "button";
+    b.setAttribute("aria-pressed", String(awayIdx === i));
+    b.addEventListener("click", () => { awayIdx = i; renderAway(); });
+    seg.append(b);
+  });
+  const m = addWeeks(thisMonday, awayIdx), k = "week:" + keyOf(m);
+  const mine = me && (wk(keyOf(m)).away || {})[me];
+  const btn = $("awayBtn"), hint = $("awayHint");
+  btn.disabled = !me;
+  btn.textContent = mine ? "I'm not away after all" : "I'm away";
+  const onDuty = me && rotaFor(m).pair.includes(me);
+  hint.textContent = !me ? "Choose who you are at the top first."
+    : mine ? `Marked away ${awayIdx === 0 ? "this week" : "w/c " + fmt(m)}.`
+    : onDuty ? "That's your cleaning week. Sort a swap or extension with someone, then mark it here." : "";
+  btn.onclick = () => change(k, x => {
+    const a = { ...(x.away || {}) };
+    if (a[me]) delete a[me]; else a[me] = { note: $("awayNote").value.trim() };
+    return { ...x, away: a };
+  }, mine ? "Removed." : "Marked as away. Everyone can see it.");
+}
+
+function renderSupplies() {
+  const items = (store.supplies?.items || []);
+  const needed = items.filter(i => !i.got);
+  const recent = items.filter(i => i.got && Date.now() - i.gotAt < 7 * DAY);
+  const q = $("quickAdd"); q.textContent = "";
+  for (const name of QUICK) {
+    if (needed.some(i => i.name.toLowerCase() === name.toLowerCase())) continue;
+    const b = el("button", "addchip", "+ " + name); b.type = "button";
+    b.addEventListener("click", () => addSupply(name));
+    q.append(b);
   }
-  li.appendChild(chips);
+  const ul = $("supplies"); ul.textContent = "";
+  if (!needed.length && !recent.length) ul.append(el("li", "empty", "Nothing needed right now."));
+  for (const i of [...needed, ...recent]) {
+    const li = el("li", i.got ? "got" : ""), what = el("div", "what");
+    what.append(el("b", null, i.name), el("small", null, i.got ? `Bought by ${i.gotBy || "someone"} · ${fmtDay(new Date(i.gotAt))}` : `Added by ${i.by || "someone"} · ${fmtDay(new Date(i.at))}`));
+    const b = el("button", "btn small", i.got ? "Undo" : "Got it"); b.type = "button";
+    b.addEventListener("click", () => change("supplies", x => ({ items: (x.items || []).map(y => y.id !== i.id ? y : (y.got ? { ...y, got: false, gotBy: null, gotAt: null } : { ...y, got: true, gotBy: me || null, gotAt: Date.now() })) }), i.got ? "Back on the list." : "Ticked off. Thanks!"));
+    li.append(what, b); ul.append(li);
+  }
+}
+function addSupply(name) {
+  name = name.trim(); if (!name) return;
+  change("supplies", x => {
+    const items = (x.items || []).filter(y => !y.got || Date.now() - y.gotAt < 30 * DAY);
+    if (items.some(y => !y.got && y.name.toLowerCase() === name.toLowerCase())) return { items };
+    return { items: [...items, { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, by: me || null, at: Date.now(), got: false }] };
+  }, `${name} added to the list.`);
+  $("supplyInput").value = "";
+}
+
+function weekRow(m, past) {
+  const r = rotaFor(m), w = wk(keyOf(m)), li = el("li");
+  li.append(el("span", "date", fmt(m)));
+  const chips = el("div", "chips");
+  if (past) {
+    const t = w.ticks || {}, n = ALL_ROOMS.filter(x => t[x.id]).length;
+    li.append(el("span", "who", `${r.pair.join(" & ")} · ${n}/5 done`));
+    for (const [p, rooms] of r.people) for (const x of rooms) chips.append(el("span", "chip" + (t[x.id] ? "" : " miss"), `${t[x.id] ? "✓" : "✗"} ${x.name} (${p})`));
+  } else {
+    li.append(el("span", "who", r.people.map(([p, rooms]) => `${p}: ${rooms.map(x => x.name).join(", ")}`).join(" · ")));
+  }
+  for (const [name, a] of Object.entries(w.away || {})) chips.append(el("span", "chip away", `${name} away${a.note ? " · " + a.note : ""}`));
+  for (const [name, e] of Object.entries(w.ext || {})) chips.append(el("span", "chip ext", `${name} +${e.days}d`));
+  if (chips.children.length) li.append(chips);
   return li;
 }
 function renderHistory() {
   const ul = $("history"); ul.textContent = "";
-  for (let i = 1; i <= HISTORY_WEEKS; i++) {
-    const m = addWeeks(thisMonday, -i);
-    if (m < ANCHOR) break;
-    ul.appendChild(weekRow(m, true));
-  }
-  if (!ul.children.length) ul.innerHTML = '<li class="empty">The rota started on 9 Nov. Last week\'s results will show here from Monday 16 Nov.</li>';
+  for (let i = 1; i <= HISTORY_WEEKS; i++) { const m = addWeeks(thisMonday, -i); if (m < ANCHOR) break; ul.append(weekRow(m, true)); }
+  if (!ul.children.length) ul.append(el("li", "empty", "The rota started on 9 Nov. Results will show here from Monday 16 Nov."));
 }
 function renderUpcoming() {
   const ul = $("upcoming"); ul.textContent = "";
-  for (let i = 1; i <= 4; i++) ul.appendChild(weekRow(addWeeks(thisMonday, i), false));
+  for (let i = 1; i <= 4; i++) ul.append(weekRow(addWeeks(thisMonday, i), false));
 }
-const renderAll = () => { renderPeople(); renderHistory(); };
+function renderAll() { renderMe(); renderPeople(); renderExtension(); renderAway(); renderSupplies(); renderHistory(); renderUpcoming(); }
 
-let busy = false;
-async function toggle(id) {
-  if (!connected || busy) return;
-  busy = true;
-  try {
-    await load();                                   // get latest so we don't wipe someone else's tick
-    const next = { ...done(), [id]: !done()[id] };
-    ticks[thisKey] = next; renderAll();
-    await save(thisKey, next);
-    $("status").textContent = "Saved. Everyone can see it.";
-  } catch (e) {
-    $("status").textContent = "Couldn't save that. Check your signal and tap again.";
-  } finally { busy = false; }
-}
 async function refresh() {
+  if (busy) return;
   try { await load(); connected = true; $("status").textContent = "Tap a room when it's done."; }
-  catch (e) { $("status").textContent = connected ? "Couldn't refresh. Showing the last ticks we had." : "Couldn't load ticks. Check your signal."; }
-  renderAll();
+  catch (e) { $("status").textContent = connected ? "Couldn't refresh. Showing what we had." : "Couldn't load. Check your signal."; }
+  if (!busy && !document.activeElement?.matches("input")) renderAll();
 }
 
-renderHeader(); renderUpcoming(); renderAll();
+$("meSelect").addEventListener("change", e => { me = e.target.value; try { localStorage.setItem("rota-me", me); } catch (err) {} renderAll(); });
+$("supplyBtn").addEventListener("click", () => addSupply($("supplyInput").value));
+$("supplyInput").addEventListener("keydown", e => { if (e.key === "Enter") addSupply(e.target.value); });
+
+renderHeader(); renderAll();
 if (SUPABASE_URL && SUPABASE_KEY) {
   refresh();
-  setInterval(() => { if (!busy && document.visibilityState === "visible") refresh(); }, 20000);
+  setInterval(() => { if (document.visibilityState === "visible") refresh(); }, 20000);
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refresh(); });
 } else {
-  $("status").textContent = "Ticking isn't connected yet. The rota is still correct.";
+  $("status").textContent = "Saving isn't connected yet. The rota itself is correct.";
 }
 setInterval(renderDeadline, 60000);
 </script>
