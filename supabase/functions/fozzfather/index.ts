@@ -23,7 +23,7 @@ const START = Date.UTC(2026, 10, 2);  // first tracked week
 const mod = (n: number, k: number) => ((n % k) + k) % k;
 const keyOf = (t: number) => new Date(t).toISOString().slice(0, 10);
 const list = (xs: string[]) => xs.length <= 1 ? xs.join("") : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1];
-function rotaFor(monday: number) {
+function rotaBase(monday: number) {
   const w = Math.round((monday - ANCHOR) / (7 * DAY)), pair = PAIRS[mod(w, 2)], swap = mod(Math.floor(w / 2), 2) === 1;
   return { pair, people: (swap ? [[pair[1], HALVES[0]], [pair[0], HALVES[1]]] : [[pair[0], HALVES[0]], [pair[1], HALVES[1]]]) as [string, { id: string; name: string }[]][] };
 }
@@ -46,6 +46,29 @@ function nets(m: any) {
   return n;
 }
 
+// Rota for a week including edits stored in week:<date>.assign = { roomId: person }
+function rotaWith(store: Record<string, any>) {
+  return (monday: number) => {
+    const base = rotaBase(monday), assign = store["week:" + keyOf(monday)]?.assign;
+    if (!assign || !Object.keys(assign).length) return base;
+    const all = HALVES.flat(), owner: Record<string, string> = {};
+    for (const [p, rooms] of base.people) for (const r of rooms) owner[r.id] = assign[r.id] || p;
+    const people = PEOPLE.map(p => [p, all.filter(r => owner[r.id] === p)] as [string, { id: string; name: string }[]]).filter(([, rs]) => rs.length);
+    return { pair: people.map(([p]) => p), people };
+  };
+}
+function overdueFor(store: Record<string, any>, now: ReturnType<typeof london>) {
+  const rotaFor = rotaWith(store), out: Record<string, string[]> = {};
+  for (let m = now.monday - 7 * DAY; m >= START; m -= 7 * DAY) {
+    const k = keyOf(m), w = store["week:" + k] || {}, t = w.ticks || {}, ext = w.ext || {};
+    for (const [p, rooms] of rotaFor(m).people) for (const r of rooms) {
+      const endDay = m + 6 * DAY + (ext[p]?.days || 0) * DAY;
+      if (!t[r.id] && now.today > endDay) (out[p] ||= []).push(r.name);
+    }
+  }
+  return out;
+}
+
 type Msg = { person: string; title: string; body: string; url: string; tag: string };
 
 async function compute(now = london()): Promise<Msg[]> {
@@ -54,17 +77,10 @@ async function compute(now = london()): Promise<Msg[]> {
   const wk = (k: string) => store["week:" + k] || {};
   const msgs: Msg[] = [];
   const send = (person: string, body: string, tag: string, url = APP + "#home") => msgs.push({ person, title: "The Fozzfather", body, url, tag });
+  const rotaFor = rotaWith(store);
   const thisKey = keyOf(now.monday), thisRota = rotaFor(now.monday), ticks = wk(thisKey).ticks || {};
 
-  // Overdue from earlier weeks (respecting extensions)
-  const overdue: Record<string, string[]> = {};
-  for (let m = now.monday - 7 * DAY; m >= START; m -= 7 * DAY) {
-    const k = keyOf(m), t = wk(k).ticks || {}, ext = wk(k).ext || {};
-    for (const [p, rooms] of rotaFor(m).people) for (const r of rooms) {
-      const endDay = m + 6 * DAY + (ext[p]?.days || 0) * DAY; // last allowed day
-      if (!t[r.id] && now.today > endDay) (overdue[p] ||= []).push(r.name);
-    }
-  }
+  const overdue = overdueFor(store, now);
 
   // 09:00 every day: overdue nag
   if (now.hour === 9) for (const [p, rooms] of Object.entries(overdue))
@@ -96,6 +112,17 @@ async function compute(now = london()): Promise<Msg[]> {
   if (now.dow === 6 && now.hour === 12) {
     const n = nets(store.money || {});
     for (const p of PEOPLE) if (n[p] < 0) send(p, `💷 You owe ${gbp(n[p])} in the house. Settle up in the Money tab when you can.`, "owe", APP + "#money");
+  }
+
+  // 18:00: standing orders due tomorrow
+  if (now.hour === 18) {
+    const tomorrowDay = new Date(now.today + DAY).getUTCDate();
+    for (const it of (store.recurring?.items || []) as any[]) if (it.day === tomorrowDay) {
+      const each = Math.floor(it.amount / it.split.length);
+      for (const p of it.split as string[]) send(p, it.mode === "expense"
+        ? `${it.title} goes out tomorrow (${gbp(it.amount)}). ${it.paidBy} pays and your share of ${gbp(each)} gets added to the Money tab.`
+        : `${it.title} is due tomorrow. Your share: ${gbp(each)}. Make sure it's paid.`, "so-" + it.id, APP + "#money");
+    }
   }
 
   // Saturday 10:00: shopping list
@@ -152,6 +179,27 @@ Deno.serve(async req => {
     return json(await deliver(msgs));
   }
 
+  // Nudge: someone taps the nudge button on an overdue room or money owed. Text is built here, never taken from the caller.
+  if (body.mode === "nudge" && PEOPLE.includes(body.to) && (body.kind === "overdue" || body.kind === "money")) {
+    const from = PEOPLE.includes(body.from) ? body.from : "Someone";
+    const { data: rows } = await db.from("rota").select("key,data");
+    const store: Record<string, any> = Object.fromEntries((rows || []).map((r: any) => [r.key, r.data || {}]));
+    const log = store["fozz:nudges"] || {}, k = `${body.kind}:${body.to}`;
+    if (log[k] && Date.now() - log[k] < 3 * 3600 * 1000) return json({ limited: true, sent: 0 });
+    let text = "";
+    if (body.kind === "overdue") {
+      const rooms = overdueFor(store, london())[body.to] || [];
+      if (!rooms.length) return json({ sent: 0, nothing: true });
+      text = `👉 ${from} nudged you: ${list(rooms)} ${rooms.length > 1 ? "are" : "is"} overdue. Get it done and tick it off.`;
+    } else {
+      const owed = nets(store.money || {})[body.to];
+      if (!(owed < 0)) return json({ sent: 0, nothing: true });
+      text = `👉 ${from} nudged you: you owe ${gbp(owed)} in the house. Settle up in the Money tab.`;
+    }
+    await db.from("rota").upsert({ key: "fozz:nudges", data: { ...log, [k]: Date.now() } });
+    return json(await deliver([{ person: body.to, title: "The Fozzfather", body: text, url: APP + (body.kind === "money" ? "#money" : "#rota"), tag: "nudge-" + body.kind }]));
+  }
+
   if (!authed) return json({ error: "not allowed" }, 401);
 
   // Message everyone who has notifications on
@@ -166,7 +214,25 @@ Deno.serve(async req => {
     const { data: logRow } = await db.from("rota").select("data").eq("key", "fozz:log").maybeSingle();
     const log = logRow?.data?.slots || [];
     if (log.includes(slot)) return json({ skipped: slot });
-    const result = await deliver(await compute(now));
+    const extra: Msg[] = [];
+    if (now.hour >= 9) {
+      const { data: rr } = await db.from("rota").select("key,data").in("key", ["recurring", "money"]);
+      const rec = (rr || []).find((r: any) => r.key === "recurring")?.data || { items: [] };
+      const money = (rr || []).find((r: any) => r.key === "money")?.data || {};
+      const month = keyOf(now.today).slice(0, 7), dayNum = new Date(now.today).getUTCDate();
+      let changed = false;
+      for (const it of rec.items || []) {
+        if (it.mode !== "expense" || it.day > dayNum || it.lastRun === month) continue;
+        const base = Math.floor(it.amount / it.split.length), remPence = it.amount - base * it.split.length;
+        const split = Object.fromEntries(it.split.map((p: string, i: number) => [p, base + (i < remPence ? 1 : 0)]));
+        money.expenses = [...(money.expenses || []), { id: `so-${it.id}-${month}`, desc: `${it.title} (standing order)`, amount: it.amount, paidBy: it.paidBy, split, date: keyOf(now.today), receipt: null, by: "Fozzfather", at: Date.now() }];
+        it.lastRun = month; changed = true;
+        for (const [p, share] of Object.entries(split) as [string, number][]) if (p !== it.paidBy)
+          extra.push({ person: p, title: "The Fozzfather", body: `${it.title} has gone out. You owe ${it.paidBy} ${gbp(share)}.`, url: APP + "#money", tag: "so-" + it.id });
+      }
+      if (changed) { await db.from("rota").upsert({ key: "money", data: money }); await db.from("rota").upsert({ key: "recurring", data: rec }); }
+    }
+    const result = await deliver([...(await compute(now)), ...extra]);
     await db.from("rota").upsert({ key: "fozz:log", data: { slots: [...log, slot].slice(-60) } });
     return json({ slot, ...result });
   }

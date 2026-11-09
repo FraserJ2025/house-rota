@@ -140,7 +140,9 @@ details p { margin: 8px 0 0; }
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(78px + env(safe-area-inset-bottom, 0px)); z-index: 30; margin: 0;
   max-width: min(92vw, 440px); background: var(--ink); color: var(--bg); padding: 10px 14px; border-radius: 12px; font-size: 14px; font-weight: 700;
   opacity: 0; pointer-events: none; transition: opacity .2s; }
-.toast.show { opacity: 1; }
+.toast.show { opacity: 1; pointer-events: auto; }
+.toast { display: flex; align-items: center; gap: 12px; }
+.toast .undo { border: 0; background: transparent; color: var(--glove); font-weight: 800; font-size: 15px; padding: 6px 4px; cursor: pointer; text-transform: uppercase; letter-spacing: .04em; }
 
 /* ---- Home dashboard ---- */
 .hello h1 { font-size: 32px; font-weight: 800; }
@@ -198,7 +200,7 @@ input[type=date] { width: 100%; min-width: 0; border: 1px solid var(--line); bac
 .nets .mini { margin-top: 8px; }
 
 /* ---- Notifications bell ---- */
-.bell { position: fixed; z-index: 25; top: calc(10px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px));
+.bell { position: absolute; z-index: 25; top: calc(10px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px));
   width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); display: grid; place-items: center; cursor: pointer; box-shadow: 0 2px 8px -4px rgba(0,0,0,.3); }
 .bell svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .bell.off::after { content: ""; position: absolute; top: 6px; right: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--red); border: 2px solid var(--surface); }
@@ -209,6 +211,60 @@ dialog.sheet::backdrop { background: rgba(0,0,0,.45); }
 dialog.sheet h2 { font-size: 22px; margin-bottom: 8px; }
 dialog.sheet ol { padding-left: 20px; margin: 8px 0; display: grid; gap: 6px; }
 dialog.sheet .row { margin-top: 12px; }
+
+/* ---- Avatars, nudges ---- */
+.av { display: inline-grid; place-items: center; flex: none; border-radius: 50%; overflow: hidden; color: #fff; font-family: var(--display); font-weight: 800; line-height: 1; }
+.av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.who-row { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.overdue .nudge { background: #fff; color: var(--red); border-color: #fff; margin-left: auto; }
+.chipbtn { border: 0; cursor: pointer; font: inherit; font-size: 12px; }
+.chipbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.whobtn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
+.editrow { display: grid; grid-template-columns: 1fr 9em; align-items: center; gap: 10px; padding: 6px 0; font-weight: 700; }
+.editrow select { width: 100%; }
+.weeks .editbtn { grid-column: 2; justify-self: start; }
+#editThisWeek { justify-self: start; }
+#settleList li { flex-wrap: wrap; row-gap: 8px; }
+#settleList li .what { flex: 1 1 100%; }
+#settleList li .actions { margin-left: auto; }
+body { position: relative; }
+.photo-row { display: flex; align-items: center; gap: 14px; }
+.photo-row label { cursor: pointer; }
+
+/* ---- Collapsible add forms ---- */
+details.adder > summary { list-style: none; }
+details.adder > summary::-webkit-details-marker { display: none; }
+details.adder[open] > summary { margin-bottom: 12px; }
+details.adder.inner > summary { display: inline-flex; align-items: center; }
+.stack { display: grid; gap: 10px; }
+.label { margin: 0 0 6px; font-size: 13px; font-weight: 700; color: var(--muted); }
+.sharing { margin: 6px 0 0; font-size: 14px; font-weight: 700; color: var(--accent); }
+#soPayerBox select { width: 100%; }
+
+/* ---- Month calendar ---- */
+.calhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.calhead .btn { min-width: 44px; font-size: 20px; line-height: 1; }
+.calgrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.calgrid .dow { text-align: center; font-size: 12px; font-weight: 700; color: var(--muted); padding: 2px 0; }
+.calgrid .day { aspect-ratio: 1 / 1.05; min-width: 0; border: 1px solid transparent; background: var(--bg); border-radius: 10px; display: grid; grid-template-rows: 1fr auto; justify-items: center; padding: 4px 0 5px; cursor: pointer; font: inherit; color: inherit; }
+.calgrid .day .num { font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; align-self: center; }
+.calgrid .day.other { opacity: .4; }
+.calgrid .day.today { border-color: var(--accent); }
+.calgrid .day.today .num { color: var(--accent); }
+.calgrid .day.sel { background: var(--accent); color: #fff; }
+.calgrid .day.sel .num { color: #fff; }
+.calgrid .day:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+.dots { display: flex; gap: 3px; height: 6px; }
+.dots i, .legend span::before { width: 6px; height: 6px; border-radius: 50%; background: var(--evc, var(--accent)); display: inline-block; }
+.dots i[data-type=bill], .legend [data-type=bill] { --evc: var(--red); }
+.dots i[data-type=guest], .legend [data-type=guest] { --evc: var(--glove); }
+.dots i[data-type=social], .legend [data-type=social] { --evc: var(--done); }
+.dots i[data-type=away], .legend [data-type=away] { --evc: var(--away); }
+.dots i[data-type=inspection], .legend [data-type=inspection] { --evc: var(--warn); }
+.calgrid .day.sel .dots i { box-shadow: 0 0 0 1.5px #fff; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.legend span::before { content: ""; }
 
 /* ---- House info ---- */
 .info { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; }
@@ -223,7 +279,7 @@ dialog.sheet .row { margin-top: 12px; }
   <main class="screen" data-screen="home">
     <header class="hello">
       <span class="eyebrow" id="todayLabel">Today</span>
-      <h1 id="helloName">Hi there</h1>
+      <div class="who-row"><span id="helloAv"></span><h1 id="helloName">Hi there</h1></div>
     </header>
     <section class="card" id="homeWho" hidden>
       <div class="sechead"><h2 class="sec">Who are you?</h2><p>Pick your name once. This phone remembers it.</p></div>
@@ -248,6 +304,7 @@ dialog.sheet .row { margin-top: 12px; }
     <header>
       <span class="eyebrow" id="weekLabel">This week</span>
       <h1>On cleaning: <span class="pair" id="pairName">…</span></h1>
+    <button class="btn small" id="editThisWeek" type="button">Edit this week's rota</button>
       <span class="deadline" id="deadline">Due Sunday night</span>
     </header>
     <section class="progress" aria-label="Progress this week">
@@ -268,10 +325,13 @@ dialog.sheet .row { margin-top: 12px; }
         <button class="btn primary" id="commentBtn" type="button">Post</button>
       </div>
     </section>
-    <section class="card" id="extCard">
-      <div class="sechead"><h2 class="sec">Need more time?</h2><p id="extIntro">Ask for an extension on your rooms this week.</p></div>
-      <div id="extBody"></div>
-    </section>
+    <details class="adder">
+      <summary class="btn bigbtn">⏳ Need more time?</summary>
+      <section class="card" id="extCard">
+        <div class="sechead"><h2 class="sec">Need more time?</h2><p id="extIntro">Ask for an extension on your rooms this week.</p></div>
+        <div id="extBody"></div>
+      </section>
+    </details>
     <section>
       <div class="sechead"><h2 class="sec">Previous weeks</h2></div>
       <ul class="weeks" id="history"></ul>
@@ -290,29 +350,47 @@ dialog.sheet .row { margin-top: 12px; }
 
   <main class="screen" data-screen="calendar" hidden>
     <header><span class="eyebrow">House calendar</span><h1>What's on</h1></header>
-    <section class="card">
-      <div class="sechead"><h2 class="sec">Add to the calendar</h2><p>Guests, bills due, inspections, nights out, anything the house should know.</p></div>
-      <input type="text" id="evTitle" maxlength="60" placeholder="e.g. Ewan's parents staying">
-      <div class="seg" id="evTypes" role="group" aria-label="Type"></div>
-      <div class="dates">
-        <label>From<input type="date" id="evStart"></label>
-        <label>To (optional)<input type="date" id="evEnd"></label>
+    <section class="card cal">
+      <div class="calhead">
+        <button class="btn small" id="calPrev" type="button" aria-label="Previous month">‹</button>
+        <h2 class="sec" id="calTitle">Month</h2>
+        <button class="btn small" id="calNext" type="button" aria-label="Next month">›</button>
       </div>
-      <input type="text" id="evNote" maxlength="100" placeholder="Note (optional), e.g. £85, due to Octopus">
-      <button class="btn primary" id="evAdd" type="button">Add to calendar</button>
-    </section>
-    <section class="card">
-      <div class="sechead"><h2 class="sec">Going away?</h2><p>Let everyone know which week you're not around.</p></div>
-      <div class="seg" id="awayWeeks" role="group" aria-label="Which week"></div>
-      <div class="row">
-        <input type="text" id="awayNote" maxlength="80" placeholder="Optional note, e.g. home Thu night">
-        <button class="btn primary" id="awayBtn" type="button">I'm away</button>
-      </div>
-      <p class="hint" id="awayHint"></p>
+      <div class="calgrid" id="calGrid" role="grid"></div>
+      <div class="legend"><span data-type="bill">Bill</span><span data-type="guest">Guest</span><span data-type="social">Social</span><span data-type="away">Away</span><span data-type="inspection">Inspection</span></div>
     </section>
     <section>
-      <div class="sechead"><h2 class="sec">Next 8 weeks</h2></div>
-      <div id="agenda"></div>
+      <div class="sechead"><h2 class="sec" id="dayTitle">Today</h2><p id="dayRota"></p></div>
+      <div id="dayList" class="stack"></div>
+    </section>
+    <details class="adder" id="evAdder">
+      <summary class="btn primary bigbtn">＋ Add to the calendar</summary>
+      <section class="card">
+        <input type="text" id="evTitle" maxlength="60" placeholder="e.g. Ewan's parents staying">
+        <div class="seg" id="evTypes" role="group" aria-label="Type"></div>
+        <div class="dates">
+          <label>From<input type="date" id="evStart"></label>
+          <label>To (optional)<input type="date" id="evEnd"></label>
+        </div>
+        <input type="text" id="evNote" maxlength="100" placeholder="Note (optional), e.g. £85, due to Octopus">
+        <button class="btn primary" id="evAdd" type="button">Add to calendar</button>
+      </section>
+    </details>
+    <details class="adder">
+      <summary class="btn bigbtn">✈️ Going away?</summary>
+      <section class="card">
+        <div class="sechead"><h2 class="sec">Going away?</h2><p>Let everyone know which week you're not around.</p></div>
+        <div class="seg" id="awayWeeks" role="group" aria-label="Which week"></div>
+        <div class="row">
+          <input type="text" id="awayNote" maxlength="80" placeholder="Optional note, e.g. home Thu night">
+          <button class="btn primary" id="awayBtn" type="button">I'm away</button>
+        </div>
+        <p class="hint" id="awayHint"></p>
+      </section>
+    </details>
+    <section>
+      <div class="sechead"><h2 class="sec">Coming up</h2></div>
+      <div id="agenda" class="stack"></div>
     </section>
   </main>
 
@@ -326,43 +404,69 @@ dialog.sheet .row { margin-top: 12px; }
       <details class="nets"><summary>Everyone's balance</summary><ul class="mini" id="netList"></ul></details>
     </section>
 
+    <details class="adder" id="exAdder">
+      <summary class="btn primary bigbtn">＋ Add an expense</summary>
+      <section class="card">
+        <input type="text" id="exDesc" maxlength="60" placeholder="What was it? e.g. Asda shop">
+        <div class="dates">
+          <label>Amount (£)<input type="text" id="exAmount" inputmode="decimal" maxlength="10" placeholder="0.00"></label>
+          <label>Paid by<select id="exPaidBy"></select></label>
+        </div>
+        <div>
+          <p class="label">Who's sharing this?</p>
+          <div class="seg" id="exSplitWho" role="group" aria-label="Who's sharing this"></div>
+          <p class="sharing" id="exSharing"></p>
+        </div>
+        <div class="seg" id="exSplitMode" role="group" aria-label="How to split"></div>
+        <div id="exCustom" class="custom" hidden></div>
+        <label class="photo">
+          <input type="file" id="exReceipt" accept="image/*">
+          <span id="exReceiptLabel">📎 Add receipt photo (optional)</span>
+        </label>
+        <p class="hint" id="exPreview"></p>
+        <button class="btn primary" id="exAdd" type="button">Add expense</button>
+      </section>
+    </details>
+
     <section class="card">
-      <div class="sechead"><h2 class="sec">Add an expense</h2></div>
-      <input type="text" id="exDesc" maxlength="60" placeholder="What was it? e.g. Asda shop">
-      <div class="dates">
-        <label>Amount (£)<input type="text" id="exAmount" inputmode="decimal" maxlength="10" placeholder="0.00"></label>
-        <label>Paid by<select id="exPaidBy"></select></label>
-      </div>
-      <div>
-        <p class="hint" style="margin-bottom:6px">Split between</p>
-        <div class="seg" id="exSplitWho" role="group" aria-label="Split between"></div>
-      </div>
-      <div class="seg" id="exSplitMode" role="group" aria-label="How to split"></div>
-      <div id="exCustom" class="custom" hidden></div>
-      <label class="photo">
-        <input type="file" id="exReceipt" accept="image/*">
-        <span id="exReceiptLabel">📎 Add receipt photo (optional)</span>
-      </label>
-      <p class="hint" id="exPreview"></p>
-      <button class="btn primary" id="exAdd" type="button">Add expense</button>
+      <div class="sechead"><h2 class="sec">Standing orders</h2><p>Regular bills like rent. They either remind everyone or add themselves as an expense each month.</p></div>
+      <ul class="list" id="soList"></ul>
+      <details class="adder inner">
+        <summary class="btn">＋ Add a standing order</summary>
+        <div class="stack">
+          <input type="text" id="soTitle" maxlength="40" placeholder="e.g. Rent">
+          <div class="dates">
+            <label>Amount (£)<input type="text" id="soAmount" inputmode="decimal" maxlength="10" placeholder="2200.00"></label>
+            <label>Day of month<select id="soDay"></select></label>
+          </div>
+          <div class="seg" id="soMode" role="group" aria-label="How it works"></div>
+          <div id="soPayerBox"><label class="label" for="soPaidBy">Who pays it</label><select id="soPaidBy"></select></div>
+          <div><p class="label">Shared by</p><div class="seg" id="soWho" role="group" aria-label="Shared by"></div><p class="sharing" id="soSharing"></p></div>
+          <button class="btn primary" id="soAdd" type="button">Add standing order</button>
+        </div>
+      </details>
+    </section>
+
+    <section class="card">
+      <div class="sechead"><h2 class="sec">Bills due</h2><p>One-off bills. The Fozzfather reminds everyone the day before.</p></div>
+      <ul class="list" id="billsList"></ul>
+      <details class="adder inner">
+        <summary class="btn">＋ Add a bill due</summary>
+        <div class="stack">
+          <input type="text" id="billTitle" maxlength="60" placeholder="e.g. Energy bill">
+          <div class="dates">
+            <label>Due<input type="date" id="billDate"></label>
+            <label>Amount (optional)<input type="text" id="billAmount" maxlength="20" placeholder="£85"></label>
+          </div>
+          <button class="btn primary" id="billAdd" type="button">Add bill</button>
+        </div>
+      </details>
     </section>
 
     <section class="card">
       <div class="sechead"><h2 class="sec">Activity</h2></div>
       <ul class="list" id="exList"></ul>
     </section>
-
-    <section class="card">
-      <div class="sechead"><h2 class="sec">Bills due</h2><p>The Fozzfather reminds everyone the day before.</p></div>
-      <ul class="list" id="billsList"></ul>
-      <input type="text" id="billTitle" maxlength="60" placeholder="e.g. Energy bill">
-      <div class="dates">
-        <label>Due<input type="date" id="billDate"></label>
-        <label>Amount (optional)<input type="text" id="billAmount" maxlength="20" placeholder="£85"></label>
-      </div>
-      <button class="btn" id="billAdd" type="button">Add bill</button>
-    </section>
-    <p class="hint">Older history is still on <a href="https://secure.splitwise.com/#/groups/102632907" target="_blank" rel="noopener">Splitwise</a>.</p>
   </main>
 
   <main class="screen" data-screen="house" hidden>
@@ -383,6 +487,10 @@ dialog.sheet .row { margin-top: 12px; }
     </section>
     <section class="card">
       <div class="sechead"><h2 class="sec">This phone</h2></div>
+      <div class="photo-row">
+        <span id="myPhoto"></span>
+        <label class="btn"><input type="file" id="photoInput" accept="image/*" hidden><span id="photoLabel">Change your photo</span></label>
+      </div>
     <div class="me">
       <span id="meText">Who's using this phone?</span>
       <select id="meSelect" aria-label="Who are you?">
@@ -400,6 +508,9 @@ dialog.sheet .row { margin-top: 12px; }
 
 <button class="bell off" id="bell" type="button" aria-label="Notifications"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>
 <dialog class="sheet" id="notifSheet"><div id="notifSheetBody"></div><div class="row"><button class="btn" id="notifClose" type="button">Close</button></div></dialog>
+
+<dialog class="sheet" id="rotaSheet"><div id="rotaSheetBody"></div>
+  <div class="row"><button class="btn primary" id="rotaSave" type="button">Save</button><button class="btn" id="rotaReset" type="button">Reset to normal</button><button class="btn" id="rotaCancel" type="button">Cancel</button></div></dialog>
 
 <p class="toast" id="status" role="status" aria-live="polite"></p>
 
@@ -440,14 +551,43 @@ const keyOf = m => `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, "0
 const mod = (n, k) => ((n % k) + k) % k;
 const fmt = d => d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 const fmtDay = d => d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
-function rotaFor(m) {
+function rotaBase(m) {
   const w = weekIndex(m), pair = PAIRS[mod(w, 2)], swap = mod(Math.floor(w / 2), 2) === 1;
   return { pair, people: swap ? [[pair[1], HALVES[0]], [pair[0], HALVES[1]]] : [[pair[0], HALVES[0]], [pair[1], HALVES[1]]] };
 }
 
 const thisMonday = mondayOf(new Date());
 const thisKey = keyOf(thisMonday);
-const rota = rotaFor(thisMonday);
+let rota = rotaBase(thisMonday);
+// The rota for a week, including any edits made for that week (store["week:…"].assign = { roomId: person })
+function rotaFor(m) {
+  const base = rotaBase(m), assign = wk(keyOf(m)).assign;
+  if (!assign || !Object.keys(assign).length) return base;
+  const owner = {}; for (const [p, rooms] of base.people) for (const r of rooms) owner[r.id] = assign[r.id] || p;
+  const people = PEOPLE.map(p => [p, ALL_ROOMS.filter(r => owner[r.id] === p)]).filter(([, rs]) => rs.length);
+  return { pair: people.map(([p]) => p), people, edited: true };
+}
+let editKey = null;
+function openRotaEditor(m) {
+  editKey = keyOf(m);
+  const base = rotaBase(m), cur = rotaFor(m), owner = {};
+  for (const [p, rooms] of cur.people) for (const r of rooms) owner[r.id] = p;
+  const box = $("rotaSheetBody"); box.textContent = "";
+  box.append(el("h2", null, `Edit rota · w/c ${fmt(m)}`), el("p", "hint", `Normally ${base.pair.join(" & ")}. Choose who does each room this week.`));
+  for (const r of ALL_ROOMS) {
+    const l = el("label", "editrow"); l.append(el("span", null, r.name));
+    const sel = el("select"); sel.id = "assign-" + r.id; PEOPLE.forEach(p => sel.append(new Option(p, p))); sel.value = owner[r.id];
+    l.append(sel); box.append(l);
+  }
+  $("rotaSheet").showModal();
+}
+function saveRotaEdit(reset) {
+  const m = parseDay(editKey), base = rotaBase(m), assign = {};
+  if (!reset) for (const [p, rooms] of base.people) for (const r of rooms) { const v = $("assign-" + r.id).value; if (v !== p) assign[r.id] = v; }
+  $("rotaSheet").close();
+  change("week:" + editKey, x => { const y = { ...x }; if (Object.keys(assign).length) y.assign = assign; else delete y.assign; return y; },
+    reset ? `w/c ${fmt(m)} is back to the normal rota.` : `Rota for w/c ${fmt(m)} updated.`);
+}
 const $ = id => document.getElementById(id);
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 const TICK = '<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
@@ -476,18 +616,22 @@ async function save(key, data) {
 }
 // Fetch latest, apply a change to one key, save. Keeps other people's edits.
 let busy = false;
-async function change(key, fn, okMsg) {
-  if (!connected) { say("Saving isn't connected yet."); return; }
-  if (busy) return;
+async function change(key, fn, okMsg, opts = {}) {
+  if (!connected) { say("Saving isn't connected yet."); return false; }
+  if (busy) return false;
   busy = true;
   try {
     await load();
+    const before = store[key] === undefined ? {} : structuredClone(store[key]);
     const next = fn(structuredClone(store[key] || {}));
     store[key] = next; renderAll();
     await save(key, next);
-    say(okMsg || "Saved. Everyone can see it.");
+    // Every change can be undone from the pop-up for a few seconds
+    say(okMsg || "Saved. Everyone can see it.", opts.noUndo ? null : () => change(key, () => before, "Undone.", { noUndo: true }));
+    return true;
   } catch (e) {
     say("Couldn't save that. Check your signal and try again.");
+    return false;
   } finally { busy = false; }
 }
 
@@ -519,7 +663,7 @@ function renderPeople() {
   box.textContent = "";
   for (const [name, rooms] of rota.people) {
     const card = el("article", "card person");
-    const h = el("h2"); h.append(el("span", null, name), el("small", null, `${rooms.filter(r => d[r.id]).length}/${rooms.length} done`));
+    const h = el("h2"); const nm = el("span", "who-row"); nm.append(avatar(name, 36), el("span", null, name)); h.append(nm, el("small", null, `${rooms.filter(r => d[r.id]).length}/${rooms.length} done`));
     card.append(h);
     const ext = (w.ext || {})[name], away = (w.away || {})[name];
     if (away) { const n = el("div", "note away"); n.append(el("b", null, "Away this week"), document.createTextNode(away.note ? ` · ${away.note}` : "")); card.append(n); }
@@ -649,10 +793,16 @@ function weekRow(m, past) {
     li.append(el("span", "who", `${r.pair.join(" & ")} · ${n}/5 done`));
     for (const [p, rooms] of r.people) for (const x of rooms) {
       const tk = t[x.id], late = tk && typeof tk === "object" && tk.at > personEnd(m, p).getTime();
-      chips.append(el("span", "chip" + (!tk ? " miss" : late ? " late" : ""), `${tk ? "✓" : "✗"} ${x.name} (${p})${late ? " · late" : ""}`));
+      const c = el("button", "chip chipbtn" + (!tk ? " miss" : late ? " late" : ""), `${tk ? "✓" : "✗"} ${x.name} (${p})${late ? " · late" : ""}`);
+      c.type = "button"; c.title = tk ? "Tap to untick" : "Tap to tick";
+      c.addEventListener("click", () => change("week:" + keyOf(m), w2 => { const tt = { ...(w2.ticks || {}) }; if (tt[x.id]) delete tt[x.id]; else tt[x.id] = { by: me || null, at: Date.now() }; return { ...w2, ticks: tt }; },
+        tk ? `${x.name} unticked for w/c ${fmt(m)}.` : `${x.name} ticked for w/c ${fmt(m)}.`));
+      chips.append(c);
     }
   } else {
     li.append(el("span", "who", r.people.map(([p, rooms]) => `${p}: ${rooms.map(x => x.name).join(", ")}`).join(" · ")));
+    const eb = el("button", "btn small editbtn", r.edited ? "Edited · change" : "Edit"); eb.type = "button";
+    eb.addEventListener("click", () => openRotaEditor(m)); li.append(eb);
   }
   for (const [name, a] of Object.entries(w.away || {})) chips.append(el("span", "chip away", `${name} away${a.note ? " · " + a.note : ""}`));
   for (const [name, e] of Object.entries(w.ext || {})) chips.append(el("span", "chip ext", `${name} +${e.days}d`));
@@ -694,7 +844,9 @@ function renderOverdue() {
     const mine = items.filter(i => i.person === p), wrap = el("div", "od-person");
     const first = mine[mine.length - 1];
     const days = Math.floor((Date.now() - first.end) / DAY);
-    wrap.append(el("b", null, p));
+    const who = el("div", "who-row"); who.append(avatar(p, 32), el("b", null, p));
+    if (p !== me && mine.some(i => i.late)) { const nb = el("button", "btn small nudge", `👉 Nudge ${p}`); nb.type = "button"; nb.addEventListener("click", () => nudge("overdue", p)); who.append(nb); }
+    wrap.append(who);
     wrap.append(el("p", null, mine.some(i => i.late)
       ? `From w/c ${fmt(first.monday)}. Was due ${fmtDay(first.end)}${days >= 1 ? `, ${days} day${days > 1 ? "s" : ""} ago` : ""}.${first.away ? ` ${p} was marked away that week.` : ""}`
       : `Extension until ${fmtDay(first.end)} 23:59.`));
@@ -744,7 +896,13 @@ function postComment() {
 }
 // ---- Toast messages ----
 let toastTimer;
-function say(msg) { const t = $("status"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2600); }
+function say(msg, undo) {
+  const t = $("status"); t.textContent = "";
+  t.append(el("span", null, msg));
+  if (undo) { const b = el("button", "undo", "Undo"); b.type = "button"; b.addEventListener("click", () => { t.classList.remove("show"); undo(); }); t.append(b); }
+  t.classList.add("show"); clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), undo ? 7000 : 2600);
+}
 
 // ---- Who am I ----
 function setMe(name) { me = name; try { localStorage.setItem("rota-me", me); } catch (err) {} if (mySub && me) saveSub(mySub).catch(() => {}); renderAll(); }
@@ -776,6 +934,10 @@ function allEvents() {
     const m = parseDay(k.slice(5));
     evs.push({ id: "away-" + k + name, src: "away", type: "away", title: `${name} away`, note: a.note || "", start: keyOf(m), end: keyOf(addDays(m, 6)), by: name });
   }
+  for (const it of store.recurring?.items || []) for (let i = 0; i < 4; i++) {
+    const base = new Date(); const d = new Date(base.getFullYear(), base.getMonth() - 1 + i, it.day);
+    evs.push({ id: `so-${it.id}-${keyOf(d)}`, src: "so", type: "bill", title: it.title, note: `${gbp(it.amount)} · standing order`, start: keyOf(d), end: null });
+  }
   return evs.sort((a, b) => a.start.localeCompare(b.start));
 }
 const overlaps = (e, from, to) => e.start <= to && (e.end || e.start) >= from;
@@ -796,6 +958,7 @@ function evNode(e) {
   }
   return d;
 }
+let calMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1), calDay = null;
 function renderCalendar() {
   const seg = $("evTypes"); seg.textContent = "";
   for (const [id, label] of EV_TYPES) {
@@ -804,19 +967,42 @@ function renderCalendar() {
     seg.append(b);
   }
   if (!$("evStart").value) $("evStart").value = todayKey();
-  const box = $("agenda"); box.textContent = "";
+  calDay = calDay || todayKey();
   const evs = allEvents();
-  for (let i = 0; i < 8; i++) {
-    const m = addWeeks(thisMonday, i), from = keyOf(m), to = keyOf(addDays(m, 6));
-    const wkEl = el("div", "agweek");
-    const h = el("h3"); h.append(document.createTextNode(i === 0 ? "This week" : `w/c ${fmt(m)}`), el("span", null, `Cleaning: ${rotaFor(m).pair.join(" & ")}`));
-    wkEl.append(h);
-    const these = evs.filter(e => overlaps(e, i === 0 ? todayKey() : from, to));
-    if (!these.length) wkEl.append(el("p", "none", "Nothing on."));
-    these.forEach(e => wkEl.append(evNode(e)));
-    box.append(wkEl);
+  // Month grid
+  $("calTitle").textContent = calMonth.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+  const g = $("calGrid"); g.textContent = "";
+  ["M", "T", "W", "T", "F", "S", "S"].forEach(d => g.append(el("span", "dow", d)));
+  const first = mondayOf(calMonth), monthIdx = calMonth.getMonth();
+  for (let i = 0; i < 42; i++) {
+    const d = addDays(first, i), k = keyOf(d);
+    if (i >= 35 && d.getMonth() !== monthIdx) break;
+    const cell = el("button", "day" + (d.getMonth() !== monthIdx ? " other" : "") + (k === todayKey() ? " today" : "") + (k === calDay ? " sel" : ""));
+    cell.type = "button"; cell.setAttribute("aria-label", fmtDay(d));
+    cell.append(el("span", "num", String(d.getDate())));
+    const dots = el("span", "dots");
+    const on = evs.filter(e => overlaps(e, k, k));
+    on.slice(0, 3).forEach(e => { const dot = el("i"); dot.dataset.type = e.type; dots.append(dot); });
+    cell.append(dots);
+    cell.addEventListener("click", () => { calDay = k; renderCalendar(); });
+    g.append(cell);
   }
+  // Selected day
+  const sd = parseDay(calDay), sk = calDay;
+  $("dayTitle").textContent = sk === todayKey() ? `Today · ${fmtDay(sd)}` : fmtDay(sd);
+  $("dayRota").textContent = `Cleaning that week: ${rotaFor(mondayOf(sd)).pair.join(" & ")}`;
+  const dl = $("dayList"); dl.textContent = "";
+  const these = evs.filter(e => overlaps(e, sk, sk));
+  if (!these.length) dl.append(el("p", "hint", "Nothing on this day. Tap ＋ Add to the calendar below."));
+  these.forEach(e => dl.append(evNode(e)));
+  // Short agenda: next 6 things from today
+  const box = $("agenda"); box.textContent = "";
+  const soon = evs.filter(e => (e.end || e.start) >= todayKey()).slice(0, 6);
+  if (!soon.length) box.append(el("p", "hint", "Nothing coming up."));
+  soon.forEach(e => box.append(evNode(e)));
 }
+$("calPrev").addEventListener("click", () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() - 1, 1); renderCalendar(); });
+$("calNext").addEventListener("click", () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 1); renderCalendar(); });
 function addEvent() {
   const title = $("evTitle").value.trim(), start = $("evStart").value, end = $("evEnd").value;
   if (!title) { say("Give it a title first."); $("evTitle").focus(); return; }
@@ -824,7 +1010,7 @@ function addEvent() {
   if (end && end < start) { say("The end date is before the start date."); return; }
   const ev = { id: uid(), title, type: evType, start, end: end || null, note: $("evNote").value.trim(), by: me || null, at: Date.now() };
   change("calendar", x => ({ events: [...(x.events || []).filter(y => (y.end || y.start) >= keyOf(addWeeks(thisMonday, -8))), ev] }), "Added to the calendar.");
-  $("evTitle").value = ""; $("evNote").value = ""; $("evEnd").value = "";
+  $("evTitle").value = ""; $("evNote").value = ""; $("evEnd").value = ""; $("evAdder").open = false; calDay = start;
 }
 
 // ---- House info ----
@@ -870,9 +1056,10 @@ function roomButton(r, ticked, onClick) {
 function renderHome() {
   const now = new Date(), hr = now.getHours();
   $("todayLabel").textContent = now.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+  const hav = $("helloAv"); if (hav) { hav.textContent = ""; if (me) hav.append(avatar(me, 48)); }
   $("helloName").textContent = me ? `${hr < 12 ? "Morning" : hr < 18 ? "Afternoon" : "Evening"}, ${me}` : "Welcome home";
   $("homeWho").hidden = !!me;
-  const wb = $("whoButtons"); if (!wb.children.length) PEOPLE.forEach(n => { const b = el("button", "btn", n); b.type = "button"; b.addEventListener("click", () => setMe(n)); wb.append(b); });
+  const wb = $("whoButtons"); wb.textContent = ""; PEOPLE.forEach(n => { const b = el("button", "btn whobtn"); b.type = "button"; b.append(avatar(n, 30), el("span", null, n)); b.addEventListener("click", () => setMe(n)); wb.append(b); });
 
   // Overdue alert
   const od = outstanding(), alertBox = $("homeAlert");
@@ -976,15 +1163,18 @@ function renderMoney() {
   if (!pays.length) sl.append(el("li", "empty", "Everyone's square."));
   for (const t of pays) {
     const li = el("li"), what = el("div", "what");
-    what.append(el("b", null, `${t.from} pays ${t.to}`), el("small", null, t.from === me ? "That's you" : t.to === me ? "Coming to you" : ""));
+    const wr = el("div", "who-row"); wr.append(avatar(t.from, 28), el("b", null, `${t.from} pays ${t.to}`)); what.append(wr);
+    what.append( el("small", null, t.from === me ? "That's you" : t.to === me ? "Coming to you" : ""));
     const k = t.from + ">" + t.to, b = el("button", "btn small" + (confirmSettle === k ? " primary" : ""), confirmSettle === k ? `Confirm ${gbp(t.amount)} paid` : "Settle up"); b.type = "button";
+    const nb = t.from !== me ? el("button", "btn small", "👉 Nudge") : null;
+    if (nb) { nb.type = "button"; nb.addEventListener("click", () => nudge("money", t.from)); }
     b.addEventListener("click", () => {
       if (confirmSettle !== k) { confirmSettle = k; renderMoney(); return; }
       confirmSettle = null;
       const st = { id: uid(), from: t.from, to: t.to, amount: t.amount, date: todayKey(), by: me || null, at: Date.now() };
       change("money", x => ({ ...x, settlements: [...(x.settlements || []), st] }), `Recorded: ${t.from} paid ${t.to} ${gbp(t.amount)}.`).then(() => fozz({ mode: "settle", id: st.id }));
     });
-    const actions = el("div", "actions"); actions.append(el("span", "amt", gbp(t.amount)), b);
+    const actions = el("div", "actions"); actions.append(el("span", "amt", gbp(t.amount))); if (nb) actions.append(nb); actions.append(b);
     li.append(what, actions); sl.append(li);
   }
   const nl = $("netList"); nl.textContent = "";
@@ -996,6 +1186,9 @@ function renderMoney() {
   const who = $("exSplitWho"); who.textContent = "";
   PEOPLE.forEach(p => { const b = el("button", "btn small", p); b.type = "button"; b.setAttribute("aria-pressed", String(exWho.has(p)));
     b.addEventListener("click", () => { exWho.has(p) ? exWho.delete(p) : exWho.add(p); renderMoney(); }); who.append(b); });
+  const sharers = PEOPLE.filter(p => exWho.has(p)), amt = toPence($("exAmount").value);
+  $("exSharing").textContent = !sharers.length ? "Pick at least one person." : sharers.length === 1 ? `Only ${sharers[0]} owes this.` :
+    `Shared by ${sharers.length} people: ${list(sharers)}` + (amt && exMode === "equal" ? ` · ${gbp(Math.floor(amt / sharers.length))} each` : "");
   const mode = $("exSplitMode"); mode.textContent = "";
   [["equal", "Split equally"], ["custom", "Custom amounts"]].forEach(([id, label]) => { const b = el("button", "btn small", label); b.type = "button"; b.setAttribute("aria-pressed", String(exMode === id));
     b.addEventListener("click", () => { exMode = id; renderMoney(); }); mode.append(b); });
@@ -1017,9 +1210,10 @@ function renderMoney() {
     if (it.kind === "ex") {
       if (it.receipt) { const a = el("a"); a.href = it.receipt; a.target = "_blank"; a.rel = "noopener"; const img = el("img", "thumb"); img.src = it.receipt; img.alt = "Receipt"; a.append(img); li.append(a); }
       const parts = Object.keys(it.split), mine = it.split[me];
-      what.append(el("b", null, `${it.desc} · ${gbp(it.amount)}`), el("small", null, [`${it.paidBy} paid`, `split ${parts.length === PEOPLE.length ? "4 ways" : "with " + list(parts)}`, fmtDay(parseDay(it.date)), me && it.paidBy !== me && mine ? `your share ${gbp(mine)}` : ""].filter(Boolean).join(" · ")));
+      if (it.carried) what.append(el("b", null, `${parts[0]} owes ${it.paidBy} ${gbp(it.amount)}`), el("small", null, "Outstanding from Splitwise"));
+      else what.append(el("b", null, `${it.desc} · ${gbp(it.amount)}`), el("small", null, [`${it.paidBy} paid`, sharingText(parts, it.split), fmtDay(parseDay(it.date)), me && it.paidBy !== me && mine ? `your share ${gbp(mine)}` : ""].filter(Boolean).join(" · ")));
       li.append(what);
-      if (me && it.by === me) { const b = el("button", "btn small", "Delete"); b.type = "button"; b.addEventListener("click", () => change("money", x => ({ ...x, expenses: (x.expenses || []).filter(y => y.id !== it.id) }), "Expense deleted.")); li.append(b); }
+      if (me && (it.by === me || it.carried)) { const b = el("button", "btn small", it.carried ? "Remove" : "Delete"); b.type = "button"; b.addEventListener("click", () => change("money", x => ({ ...x, expenses: (x.expenses || []).filter(y => y.id !== it.id) }), "Expense deleted.")); li.append(b); }
     } else if (it.kind === "st") {
       what.append(el("b", null, `${it.from} paid ${it.to} ${gbp(it.amount)}`), el("small", null, `Settle up · ${fmtDay(parseDay(it.date))}`)); li.append(what);
       if (me && it.by === me) { const b = el("button", "btn small", "Undo"); b.type = "button"; b.addEventListener("click", () => change("money", x => ({ ...x, settlements: (x.settlements || []).filter(y => y.id !== it.id) }), "Settle up removed.")); li.append(b); }
@@ -1041,6 +1235,7 @@ function renderMoney() {
   }
   if (!$("billDate").value) $("billDate").value = todayKey();
 }
+const sharingText = (parts, split) => parts.length === PEOPLE.length ? "shared by all 4" : parts.length === 1 ? `just ${parts[0]}` : `shared by ${parts.length}: ${list(parts)}`;
 const list = xs => xs.length <= 1 ? xs.join("") : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1];
 function currentSplit() {
   const total = toPence($("exAmount").value), people = PEOPLE.filter(p => exWho.has(p));
@@ -1056,7 +1251,7 @@ function updatePreview() {
   const r = currentSplit(), pv = $("exPreview");
   pv.textContent = r.error && $("exAmount").value ? r.error : r.split ? Object.entries(r.split).map(([p, v]) => `${p} ${gbp(v)}`).join(" · ") : "";
 }
-$("exAmount").addEventListener("input", updatePreview);
+$("exAmount").addEventListener("input", () => { updatePreview(); const sh = PEOPLE.filter(p => exWho.has(p)), a = toPence($("exAmount").value); if (sh.length > 1 && a && exMode === "equal") $("exSharing").textContent = `Shared by ${sh.length} people: ${list(sh)} · ${gbp(Math.floor(a / sh.length))} each`; });
 $("exPaidBy").addEventListener("change", e => { e.target.dataset.touched = "1"; });
 $("exReceipt").addEventListener("change", e => { exFile = e.target.files[0] || null; $("exReceiptLabel").textContent = exFile ? "📎 " + exFile.name : "📎 Add receipt photo (optional)"; });
 async function shrinkImage(file) {
@@ -1081,7 +1276,7 @@ $("exAdd").addEventListener("click", async () => {
     await change("money", x => ({ ...x, expenses: [...(x.expenses || []), ex] }), `${desc} added. Everyone involved gets a heads-up.`);
     fozz({ mode: "expense", id: ex.id });
     $("exDesc").value = ""; $("exAmount").value = ""; $("exReceipt").value = ""; exFile = null; $("exReceiptLabel").textContent = "📎 Add receipt photo (optional)";
-    $("exCustom").textContent = ""; exWho = new Set(PEOPLE); exMode = "equal"; delete $("exPaidBy").dataset.touched; renderMoney();
+    $("exCustom").textContent = ""; exWho = new Set(PEOPLE); exMode = "equal"; delete $("exPaidBy").dataset.touched; $("exAdder").open = false; renderMoney();
   } catch (e) { say("Couldn't upload the receipt. Try a smaller photo or add it without one."); }
   finally { btn.disabled = false; btn.textContent = "Add expense"; }
 });
@@ -1095,11 +1290,50 @@ $("billAdd").addEventListener("click", () => {
   $("billTitle").value = ""; $("billAmount").value = "";
 });
 
+// ---- Standing orders ----
+// store.recurring = { items: [{ id, title, amount, day, mode: "expense" | "reminder", paidBy, split: [names], by, at, lastRun }] }
+let soMode = "expense", soWho = new Set(PEOPLE);
+const ordinal = n => n + (n % 10 === 1 && n !== 11 ? "st" : n % 10 === 2 && n !== 12 ? "nd" : n % 10 === 3 && n !== 13 ? "rd" : "th");
+function nextOccurrence(day, from = new Date()) { const d = new Date(from.getFullYear(), from.getMonth(), day); if (keyOf(d) < keyOf(from)) d.setMonth(d.getMonth() + 1); return d; }
+function renderStanding() {
+  const items = store.recurring?.items || [], ul = $("soList"); ul.textContent = "";
+  if (!items.length) ul.append(el("li", "empty", "None yet. Add rent, wifi or anything that comes round every month."));
+  for (const it of items) {
+    const li = el("li"), what = el("div", "what"), each = Math.floor(it.amount / it.split.length);
+    what.append(el("b", null, `${it.title} · ${gbp(it.amount)}`), el("small", null, [`monthly on the ${ordinal(it.day)}`,
+      it.mode === "expense" ? `${it.paidBy} pays, added as an expense` : "everyone pays their own",
+      `${sharingText(it.split, null)} (${gbp(each)} each)`, `next ${fmtDay(nextOccurrence(it.day))}`].join(" · ")));
+    const b = el("button", "btn small", "Remove"); b.type = "button";
+    b.addEventListener("click", () => change("recurring", x => ({ items: (x.items || []).filter(y => y.id !== it.id) }), `${it.title} standing order removed.`));
+    li.append(what, b); ul.append(li);
+  }
+  const daySel = $("soDay"); if (!daySel.children.length) for (let d = 1; d <= 28; d++) daySel.append(new Option(ordinal(d), d));
+  const pb = $("soPaidBy"); if (!pb.children.length) PEOPLE.forEach(p => pb.append(new Option(p, p)));
+  const mode = $("soMode"); mode.textContent = "";
+  [["expense", "One person pays, others owe them"], ["reminder", "Everyone pays their own"]].forEach(([id, label]) => { const b = el("button", "btn small", label); b.type = "button"; b.setAttribute("aria-pressed", String(soMode === id)); b.addEventListener("click", () => { soMode = id; renderStanding(); }); mode.append(b); });
+  $("soPayerBox").hidden = soMode !== "expense";
+  const who = $("soWho"); who.textContent = "";
+  PEOPLE.forEach(p => { const b = el("button", "btn small", p); b.type = "button"; b.setAttribute("aria-pressed", String(soWho.has(p))); b.addEventListener("click", () => { soWho.has(p) ? soWho.delete(p) : soWho.add(p); renderStanding(); }); who.append(b); });
+  const sh = PEOPLE.filter(p => soWho.has(p)), a = toPence($("soAmount").value);
+  $("soSharing").textContent = sh.length ? `Shared by ${sh.length}: ${list(sh)}${a ? ` · ${gbp(Math.floor(a / sh.length))} each` : ""}` : "Pick at least one person.";
+}
+$("soAmount").addEventListener("input", renderStanding);
+$("soAdd").addEventListener("click", () => {
+  const title = $("soTitle").value.trim(), amount = toPence($("soAmount").value), split = PEOPLE.filter(p => soWho.has(p));
+  if (!title) { say("Name the standing order, e.g. Rent."); return; }
+  if (!amount) { say("Enter the amount."); return; }
+  if (!split.length) { say("Pick who shares it."); return; }
+  const it = { id: uid(), title, amount, day: +$("soDay").value, mode: soMode, paidBy: soMode === "expense" ? $("soPaidBy").value : null, split, by: me || null, at: Date.now(), lastRun: null };
+  change("recurring", x => ({ items: [...(x.items || []), it] }), `${title} added. The Fozzfather will handle it every month.`);
+  $("soTitle").value = ""; $("soAmount").value = ""; soWho = new Set(PEOPLE);
+  document.querySelectorAll("details.adder.inner").forEach(d => d.open = false);
+});
+
 // ---- Notifications (the Fozzfather) ----
 const VAPID_PUBLIC = "BIiFwsbUQIrzQ6kbyEJxu8GK9YV5yjq4aPAih4dyyzCxTp24pDo39Xi6xENh-7urZu0xdr3k5FQVkVurfSOBZJ8";
 const FOZZ_URL = SUPABASE_URL + "/functions/v1/fozzfather";
 const ANON_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpvY3hmZWZ5ZGdkcHNuaGhnZ2dhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQyMzg2MTUsImV4cCI6MjEwOTgxNDYxNX0.DirBJZFrRK-IefVvelk3pUrcKORrqu7JpFWNPV0qnxY"; // public anon key, needed to call the function
-const fozz = body => fetch(FOZZ_URL, { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + ANON_JWT }, body: JSON.stringify(body) }).catch(() => {});
+const fozz = body => fetch(FOZZ_URL, { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + ANON_JWT }, body: JSON.stringify(body) }).then(r => r.json()).catch(() => null);
 const pushSupported = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
 const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
 const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
@@ -1173,7 +1407,49 @@ if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").then
   renderNotif();
 }).catch(() => renderNotif());
 
-function renderAll() { renderMe(); renderHome(); renderOverdue(); renderPeople(); renderComments(); renderExtension(); renderAway(); renderSupplies(); renderHistory(); renderUpcoming(); renderCalendar(); renderInfo(); renderMoney(); renderNotif(); }
+// ---- Profile pictures ----
+const AV_COLOURS = { Fraser: "#0f7c86", Ewan: "#b5541c", Tom: "#6a55b0", Jayden: "#2f8a4c" };
+function avatar(name, size = 32) {
+  const url = store.profiles?.[name]?.photo;
+  const d = el("span", "av"); d.style.width = d.style.height = size + "px"; d.style.fontSize = Math.round(size * 0.45) + "px";
+  d.setAttribute("aria-hidden", "true");
+  if (url) { const img = el("img"); img.src = url; img.alt = ""; d.append(img); }
+  else { d.textContent = (name || "?")[0]; d.style.background = AV_COLOURS[name] || "#5b7176"; }
+  return d;
+}
+async function squarePhoto(file, px = 320) {
+  const img = await createImageBitmap(file), side = Math.min(img.width, img.height);
+  const c = document.createElement("canvas"); c.width = c.height = px;
+  c.getContext("2d").drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, px, px);
+  return await new Promise(r => c.toBlob(r, "image/jpeg", 0.85));
+}
+async function setMyPhoto(file) {
+  if (!me) { say("Pick who you are first."); return; }
+  try {
+    const blob = await squarePhoto(file), path = `${me.toLowerCase()}-${uid()}.jpg`;
+    const r = await fetch(`${SUPABASE_URL}/storage/v1/object/avatars/${path}`, { method: "POST", headers: { apikey: ANON_JWT, Authorization: "Bearer " + ANON_JWT, "Content-Type": "image/jpeg" }, body: blob });
+    if (!r.ok) throw new Error(r.status);
+    const url = `${SUPABASE_URL}/storage/v1/object/public/avatars/${path}`;
+    await change("profiles", x => ({ ...x, [me]: { ...(x[me] || {}), photo: url } }), "Photo updated.");
+  } catch (e) { say("Couldn't upload that photo. Try another one."); }
+}
+function renderProfile() {
+  const box = $("myPhoto"); if (!box) return;
+  box.textContent = ""; box.append(avatar(me || "?", 64));
+  $("photoLabel").textContent = me ? "Change your photo" : "Pick who you are first";
+}
+
+// ---- Nudges (sent by the Fozzfather) ----
+async function nudge(kind, to) {
+  if (!me) { say("Pick who you are first."); return; }
+  const r = await fozz({ mode: "nudge", kind, to, from: me });
+  if (!r) say("Couldn't send the nudge. Check your signal.");
+  else if (r.limited) say(`${to} was nudged recently. Try again later.`);
+  else if (r.sent > 0) say(`Nudge sent to ${to}. 👉`);
+  else say(`${to} hasn't turned on notifications yet, so they won't see it. Tell them to tap the 🔔.`);
+}
+
+function renderAll() { rota = rotaFor(thisMonday); renderHeader(); renderMe(); renderHome(); renderOverdue(); renderPeople(); renderComments(); renderExtension(); renderAway(); renderSupplies(); renderHistory(); renderUpcoming(); renderCalendar(); renderInfo(); renderMoney(); renderStanding(); renderNotif(); renderProfile(); }
 
 async function refresh() {
   if (busy) return;
@@ -1188,6 +1464,11 @@ $("commentInput").addEventListener("keydown", e => { if (e.key === "Enter") post
 $("supplyBtn").addEventListener("click", () => addSupply($("supplyInput").value));
 $("supplyInput").addEventListener("keydown", e => { if (e.key === "Enter") addSupply(e.target.value); });
 $("evAdd").addEventListener("click", addEvent);
+$("editThisWeek").addEventListener("click", () => openRotaEditor(thisMonday));
+$("rotaSave").addEventListener("click", () => saveRotaEdit(false));
+$("rotaReset").addEventListener("click", () => saveRotaEdit(true));
+$("rotaCancel").addEventListener("click", () => $("rotaSheet").close());
+$("photoInput").addEventListener("change", e => { const f = e.target.files[0]; if (f) setMyPhoto(f); e.target.value = ""; });
 
 renderHeader(); renderAll(); showScreen();
 refresh();
