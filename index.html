@@ -17,6 +17,7 @@
   --accent: #0f7c86; --accent-soft: #d6eef0; --glove: #f2c230; --glove-ink: #3d2f00;
   --done: #2f8a4c; --done-soft: #dcf1e2; --warn: #b5541c; --warn-soft: #fbe6d8;
   --away: #6a55b0; --away-soft: #ebe6f8;
+  --red: #c62828; --red-ink: #ffffff;
   --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
   --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
   color-scheme: light;
@@ -24,8 +25,9 @@
 @media (prefers-color-scheme: dark) { :root {
   --bg: #0e1a1d; --surface: #16262a; --ink: #e4f0f2; --muted: #93abb0; --line: #27403f;
   --accent: #4cc3cc; --accent-soft: #173a3e; --done: #5fcf83; --done-soft: #183526;
-  --warn: #f0935c; --warn-soft: #3a2316; --away: #b7a6f0; --away-soft: #2a2442; color-scheme: dark } }
+  --warn: #f0935c; --warn-soft: #3a2316; --away: #b7a6f0; --away-soft: #2a2442; --red: #d33a3a; --red-ink: #ffffff; color-scheme: dark } }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.45; -webkit-tap-highlight-color: transparent; }
 .wrap { max-width: 520px; margin: 0 auto;
   padding: calc(16px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(40px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
@@ -61,6 +63,20 @@ header h1 { font-size: 30px; font-weight: 800; line-height: 1.05; }
 .note { font-size: 14px; border-radius: 10px; padding: 8px 10px; }
 .note.ext { background: var(--accent-soft); color: var(--accent); }
 .note.away { background: var(--away-soft); color: var(--away); }
+.overdue { background: var(--red); color: var(--red-ink); border-radius: 16px; padding: 16px; display: grid; gap: 12px; box-shadow: 0 6px 20px -8px var(--red); }
+.overdue h2 { font-size: 24px; font-weight: 800; line-height: 1.1; display: flex; align-items: center; gap: 10px; }
+.overdue h2 svg { flex: none; width: 26px; height: 26px; }
+.overdue p { margin: 0; font-size: 14px; opacity: .92; }
+.overdue .od-person { display: grid; gap: 8px; }
+.overdue .od-person b { font-size: 17px; }
+.overdue .room { background: rgba(255,255,255,.14); color: var(--red-ink); }
+.overdue .room .rhint { color: var(--red-ink); opacity: .85; }
+.overdue .room .tick { border-color: var(--red-ink); }
+.overdue.pending { background: var(--glove); color: var(--glove-ink); box-shadow: none; }
+.overdue.pending .room { background: rgba(0,0,0,.07); color: var(--glove-ink); }
+.overdue.pending .room .rhint { color: var(--glove-ink); }
+.overdue.pending .room .tick { border-color: var(--glove-ink); }
+.chip.late { background: var(--glove); color: var(--glove-ink); }
 .note b { font-weight: 700; }
 .rooms { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .room { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: var(--bg); border: 1px solid transparent; border-radius: 10px; padding: 12px; cursor: pointer; min-height: 52px; }
@@ -121,6 +137,8 @@ details p { margin: 8px 0 0; }
       <option>Fraser</option><option>Ewan</option><option>Tom</option><option>Jayden</option>
     </select>
   </div>
+
+  <section id="overdue" hidden></section>
 
   <header>
     <span class="eyebrow" id="weekLabel">This week</span>
@@ -212,6 +230,7 @@ const ALL_ROOMS = HALVES.flat();
 const QUICK = ["Washing-up liquid", "Bleach", "Toilet roll", "Bin bags", "Sponges", "Kitchen roll", "Surface spray", "Hand soap", "Dishwasher tabs"];
 const DAY = 86400000;
 const HISTORY_WEEKS = 4;
+const START = new Date(2026, 10, 2); // first tracked week: Mon 2 Nov 2026 (Tom & Jayden)
 
 const mondayOf = d => { const m = new Date(d.getFullYear(), d.getMonth(), d.getDate()); m.setDate(m.getDate() - ((m.getDay() + 6) % 7)); return m; };
 const addWeeks = (m, n) => { const d = new Date(m); d.setDate(d.getDate() + 7 * n); return d; };
@@ -428,7 +447,10 @@ function weekRow(m, past) {
   if (past) {
     const t = w.ticks || {}, n = ALL_ROOMS.filter(x => t[x.id]).length;
     li.append(el("span", "who", `${r.pair.join(" & ")} · ${n}/5 done`));
-    for (const [p, rooms] of r.people) for (const x of rooms) chips.append(el("span", "chip" + (t[x.id] ? "" : " miss"), `${t[x.id] ? "✓" : "✗"} ${x.name} (${p})`));
+    for (const [p, rooms] of r.people) for (const x of rooms) {
+      const tk = t[x.id], late = tk && typeof tk === "object" && tk.at > personEnd(m, p).getTime();
+      chips.append(el("span", "chip" + (!tk ? " miss" : late ? " late" : ""), `${tk ? "✓" : "✗"} ${x.name} (${p})${late ? " · late" : ""}`));
+    }
   } else {
     li.append(el("span", "who", r.people.map(([p, rooms]) => `${p}: ${rooms.map(x => x.name).join(", ")}`).join(" · ")));
   }
@@ -439,8 +461,55 @@ function weekRow(m, past) {
 }
 function renderHistory() {
   const ul = $("history"); ul.textContent = "";
-  for (let i = 1; i <= HISTORY_WEEKS; i++) { const m = addWeeks(thisMonday, -i); if (m < ANCHOR) break; ul.append(weekRow(m, true)); }
-  if (!ul.children.length) ul.append(el("li", "empty", "The rota started on 9 Nov. Results will show here from Monday 16 Nov."));
+  for (let i = 1; i <= HISTORY_WEEKS; i++) { const m = addWeeks(thisMonday, -i); if (m < START) break; ul.append(weekRow(m, true)); }
+  if (!ul.children.length) ul.append(el("li", "empty", "No previous weeks yet."));
+}
+
+// ---- Rollover: anything not done from a past week stays on top until it's ticked ----
+const WARN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5M12 18h.01"/></svg>';
+function outstanding() {
+  const now = Date.now(), items = [];
+  for (let m = addWeeks(thisMonday, -1); m >= START; m = addWeeks(m, -1)) {
+    const k = keyOf(m), t = ticksFor(k), away = wk(k).away || {};
+    for (const [p, rooms] of rotaFor(m).people) for (const r of rooms) {
+      if (t[r.id]) continue;
+      const end = personEnd(m, p);
+      items.push({ monday: m, key: k, person: p, room: r, end, late: now > end.getTime(), away: !!away[p] });
+    }
+  }
+  return items;
+}
+function renderOverdue() {
+  const box = $("overdue"), items = outstanding();
+  box.textContent = "";
+  box.hidden = !items.length;
+  if (!items.length) return;
+  const late = items.filter(i => i.late), anyLate = late.length > 0;
+  box.className = "overdue" + (anyLate ? "" : " pending");
+  box.setAttribute("role", "alert");
+  const h = el("h2"); h.innerHTML = WARN; h.append(document.createTextNode(anyLate ? `Overdue: ${late.length} room${late.length > 1 ? "s" : ""} not done` : "Still to do from last week"));
+  box.append(h);
+  const people = [...new Set(items.map(i => i.person))];
+  for (const p of people) {
+    const mine = items.filter(i => i.person === p), wrap = el("div", "od-person");
+    const first = mine[mine.length - 1];
+    const days = Math.floor((Date.now() - first.end) / DAY);
+    wrap.append(el("b", null, p));
+    wrap.append(el("p", null, mine.some(i => i.late)
+      ? `From w/c ${fmt(first.monday)}. Was due ${fmtDay(first.end)}${days >= 1 ? `, ${days} day${days > 1 ? "s" : ""} ago` : ""}.${first.away ? ` ${p} was marked away that week.` : ""}`
+      : `Extension until ${fmtDay(first.end)} 23:59.`));
+    const ul = el("ul", "rooms");
+    for (const i of mine) {
+      const li = el("li"), b = el("button", "room");
+      b.type = "button"; b.disabled = !connected;
+      b.innerHTML = `<span class="tick">${TICK}</span><span><span class="rname"></span><span class="rhint"></span></span>`;
+      b.querySelector(".rname").textContent = i.room.name;
+      b.querySelector(".rhint").textContent = `w/c ${fmt(i.monday)} · tap when it's done`;
+      b.addEventListener("click", () => change("week:" + i.key, x => ({ ...x, ticks: { ...(x.ticks || {}), [i.room.id]: { by: me || null, at: Date.now() } } }), `${i.room.name} ticked off. Banner updated.`));
+      li.append(b); ul.append(li);
+    }
+    wrap.append(ul); box.append(wrap);
+  }
 }
 function renderUpcoming() {
   const ul = $("upcoming"); ul.textContent = "";
@@ -473,7 +542,7 @@ function postComment() {
   change("week:" + thisKey, x => ({ ...x, comments: [...(x.comments || []), { id: uid(), by: me, at: Date.now(), room, text }] }), "Comment posted. Everyone can see it.");
   $("commentInput").value = "";
 }
-function renderAll() { renderMe(); renderPeople(); renderComments(); renderExtension(); renderAway(); renderSupplies(); renderHistory(); renderUpcoming(); }
+function renderAll() { renderMe(); renderOverdue(); renderPeople(); renderComments(); renderExtension(); renderAway(); renderSupplies(); renderHistory(); renderUpcoming(); }
 
 async function refresh() {
   if (busy) return;
